@@ -1,0 +1,57 @@
+[#function;largenum;{=num};{=title};{=description}]
+{=new1;{replace;{$num};m;*1000000}}
+{=new2;{replace;{$new1};b;*1000000000}}
+{=new3;{replace;{$new2};k;*1000}}
+{=new3;{replace;{$new3};,;}}
+{=new;{catch;{math;{$new3}};{return;{responder.embed title="{$title}" description="{$description}"}{responder.error}}}}
+{$new}
+[/function]
+
+{=input;{option;input}}
+{=input;{replace;{$input};, ;,}}
+{=input;{replace;{$input}; ,;,}}
+{=split;{split;{$input};,}}
+
+{=data1;{store.get;valuedata}}
+{=items1;{join;{keys;{$data1}}; }}
+{=data2;{store.get;valuedata2}}
+{=items2;{join;{keys;{$data2}}; }}
+{=data3;{store.get;valuedata3}}
+{=items3;{join;{keys;{$data3}}; }}
+{=data4;{store.get;valuedata4}}
+{=items4;{join;{keys;{$data4}}; }}
+
+{=num11;0}
+{=embed;{[]}}
+[#for;{=input1};{$split}]
+  {=split1;{split;{$input1}; }}
+  {=split1;{if;{$split1.0};==;;{slice;{$split1};1};{$split1}}}
+  {=length;{length;{$split1}}}
+  {if;{$length};==;2;
+  {=type1;{if;{$length};==;1;1item;{if;{catch;{formatNumber;{$split1.0}}};1num;1item}}}
+  {=type2;{if;{$length};==;2;{if;{$type1};==;1num;2item;2num};none}}
+  {=item;{casing mode=lower;{if;{$type1};==;1item;{$split1.0};{$split1.1}}}}
+  {=amount;{largenum;{if;{$type1};==;1num;{$split1.0};{if;{$type2};==;2num;{$split1.1};1}}}}
+  {=amount;{catch;{$amount}};{return;{responder.error;Invalid Amount!}}}
+  {=varnum;{if;{$items1};includes;{$item};1;{if;{$items2};includes;{$item};2;{if;{$items3};includes;{$item};3;{if;{$items4};includes;{$item};4}}}}}
+  {=itemfinder;{if;{$items1};includes;{$item};{replace;{find;{$items1};/([^\s]*{$item}[^\s]*)\s?/i}; ;};{if;{$items2};includes;{$item};{replace;{find;{$items2};/([^\s]*{$item}[^\s]*)\s?/i}; ;};{if;{$items3};includes;{$item};{replace;{find;{$items3};/([^\s]*{$item}[^\s]*)\s?/i}; ;};{if;{$items4};includes;{$item};{replace;{find;{$items4};/([^\s]*{$item}[^\s]*)\s?/i}; ;};{return;{responder.error;Invalid Item!}}{break}}}}}}
+  {=old;{$data{$varnum}.{$itemfinder}.price}}
+  {=data{$varnum}.{$itemfinder}.price;{$amount}}
+  {=num11;{math;{$num11}+1}}
+  {=name;{$data{$varnum}.{$itemfinder}.name}}
+  {if;{$num11};!>=;20;
+  {push;{$embed};{$name} : `⏣ {formatNumber;{$old}}` → `⏣ {formatNumber;{$amount}}`}}}
+[/for]
+
+{responder.embed 
+  title="Item Value Update"
+  description="{join;{$embed};\n}"
+  color="{random length=6;ABCDEF1234567890}"
+  thumbnail=https://emoji.gg/assets/emoji/7809-pepe-noted.gif
+  footer="{$num11} item values updated by {user.tag}"}
+  
+{store.set;valuedata;{$data1}}
+{store.set;valuedata2;{$data2}}
+{store.set;valuedata3;{$data3}}
+{store.set;valuedata4;{$data4}}
+
