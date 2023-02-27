@@ -1,0 +1,374 @@
+{
+  "oddeye": {
+    "name": "Odd Eye",
+    "price": "600000000"
+  },
+  "litterallykaren": {
+    "name": "Literally Karen",
+    "price": "74000000"
+  },
+  "creditcard": {
+    "name": "Credit Card",
+    "price": "66000000"
+  },
+  "boltcutters": {
+    "name": "Bolt Cutters",
+    "price": "101000000"
+  },
+  "winninglotteryticket": {
+    "name": "Winning Lottery Ticket",
+    "price": "15500000"
+  },
+  "plasticbox": {
+    "name": "Plastic Box",
+    "price": "6000000"
+  },
+  "oldbox": {
+    "name": "Old Box",
+    "price": "10570000"
+  },
+  "workbox": {
+    "name": "Work Box",
+    "price": "11132000"
+  },
+  "patreonbox": {
+    "name": "Patreon Box",
+    "price": "49950000"
+  },
+  "bundlebox": {
+    "name": "Bundle Box",
+    "price": "90000000"
+  },
+  "spaceadventurebox": {
+    "name": "Space Adventure Box",
+    "price": "2000000"
+  },
+  "outwestadventurebox": {
+    "name": "Out West Adventure Box",
+    "price": "2036000"
+  },
+  "godbox": {
+    "name": "God Box",
+    "price": "28000000"
+  },
+  "dankbox": {
+    "name": "Dank Box",
+    "price": "7659000"
+  },
+  "memebox": {
+    "name": "Meme Box",
+    "price": "1000000"
+  },
+  "normiebox": {
+    "name": "Normie Box",
+    "price": "469000"
+  },
+  "dailybox": {
+    "name": "Daily Box",
+    "price": "408000"
+  },
+  "skunk": {
+    "name": "Skunk",
+    "price": "15000"
+  },
+  "rabbit": {
+    "name": "Rabbit",
+    "price": "18000"
+  },
+  "duck": {
+    "name": "Duck",
+    "price": "20k"
+  },
+  "deer": {
+    "name": "Deer",
+    "price": "99000"
+  },
+  "boar": {
+    "name": "Boar",
+    "price": "60000"
+  },
+  "keyboard": {
+    "name": "Keyboard",
+    "price": "83000"
+  },
+  "dragon": {
+    "name": "Dragon",
+    "price": "350000"
+  },
+  "cookie": {
+    "name": "Cookie",
+    "price": "17000"
+  },
+  "freshbread": {
+    "name": "Fresh Bread",
+    "price": "79000"
+  },
+  "garbage": {
+    "name": "Garbage",
+    "price": "11000"
+  },
+  "junk": {
+    "name": "Junk",
+    "price": "54000"
+  },
+  "trash": {
+    "name": "Trash",
+    "price": "2000000"
+  },
+  "literallyatree": {
+    "name": "Literally a Tree",
+    "price": "2000000"
+  },
+  "potato": {
+    "name": "Potato",
+    "price": "39000"
+  },
+  "corndog": {
+    "name": "Corndog",
+    "price": "1325000"
+  },
+  "corncob": {
+    "name": "Corncob",
+    "price": "69000"
+  },
+  "worm": {
+    "name": "Worm",
+    "price": "12000"
+  },
+  "ant": {
+    "name": "Ant",
+    "price": "40000"
+  },
+  "santasbag": {
+    "name": "Santa’s Bag",
+    "price": "7500000"
+  },
+  "ladybug": {
+    "name": "Lady Bug",
+    "price": "80000"
+  },
+  "stickbug": {
+    "name": "Stick Bug",
+    "price": "95000"
+  },
+  "spider": {
+    "name": "Spider",
+    "price": "370000"
+  },
+  "fossil": {
+    "name": "Fossil",
+    "price": "800000"
+  },
+  "newplayerpack": {
+    "name": "New Player Pack",
+    "price": "1m"
+  },
+  "antirobpack": {
+    "name": "Anti Rob Pack",
+    "price": "1085000"
+  },
+  "grindpack": {
+    "name": "Grind Pack",
+    "price": "642000"
+  },
+  "prestigepack": {
+    "name": "Prestige Pack",
+    "price": "1800000"
+  },
+  "patreonpack": {
+    "name": "Patreon Pack",
+    "price": "14069000"
+  },
+  "commonfish": {
+    "name": "Common Fish",
+    "price": "11000"
+  },
+  "seaweed": {
+    "name": "Seaweed",
+    "price": "21000"
+  },
+  "rarefish": {
+    "name": "Rare Fish",
+    "price": "31000"
+  },
+  "exoticfish": {
+    "name": "Exotic Fish",
+    "price": "57000"
+  },
+  "jellyfish": {
+    "name": "Jelly Fish",
+    "price": "64000"
+  },
+  "legendaryfish": {
+    "name": "Legendary Fish",
+    "price": "443000"
+  },
+  "kraken": {
+    "name": "Kraken",
+    "price": "750000"
+  },
+  "tumbleweed": {
+    "name": "Tumbleweed",
+    "price": "600k"
+  },
+  "cowboyboots": {
+    "name": "Cowboy Boots",
+    "price": "2400000"
+  },
+  "lasso": {
+    "name": "Lasso",
+    "price": "499000"
+  },
+  "petsaddle": {
+    "name": "Pet Saddle",
+    "price": "350000"
+  },
+  "oldcowboyrevolver": {
+    "name": "Old Cowboy Revolver",
+    "price": "979000"
+  },
+  "treasuremap": {
+    "name": "Treasure Map",
+    "price": "500000"
+  },
+  "goldennugget": {
+    "name": "Golden Nugget",
+    "price": "2860000"
+  },
+  "cactus": {
+    "name": "Cactus",
+    "price": "600k"
+  },
+  "cowboyhat": {
+    "name": "Cowboy Hat ",
+    "price": "395000"
+  },
+  "blackhole": {
+    "name": "Black Hole ",
+    "price": "100000"
+  },
+  "jarofsingularity": {
+    "name": "Jar Of Singularity",
+    "price": "183000"
+  },
+  "meteorite": {
+    "name": "Meteorite",
+    "price": "1718000"
+  },
+  "aliensample": {
+    "name": "Alien Sample",
+    "price": "395000"
+  },
+  "starfragment": {
+    "name": "Star Fragment",
+    "price": "3663000"
+  },
+  "shootingstar": {
+    "name": "Shooting Star",
+    "price": "6353000"
+  },
+  "foolsnotif": {
+    "name": "Fool’s Notif",
+    "price": "350000"
+  },
+  "chillpill": {
+    "name": "Chill Pill",
+    "price": "91000"
+  },
+  "reversalcard": {
+    "name": "Reversal Card",
+    "price": "10959000"
+  },
+  "schoolurinal": {
+    "name": "School Urinal",
+    "price": "11000000"
+  },
+  "jackyolanty": {
+    "name": "Jacky o’ Lanty",
+    "price": "2850000"
+  },
+  "engagementring": {
+    "name": "Engagement Ring",
+    "price": "494k"
+  },
+  "berriesandcream": {
+    "name": "Berries and Cream",
+    "price": "20852000"
+  },
+  "royalscepter": {
+    "name": "Royal Scepter",
+    "price": "6112000"
+  },
+  "theletter": {
+    "name": "The Letter",
+    "price": "20210000"
+  },
+  "armpithair": {
+    "name": "Armpit Hair",
+    "price": "1600000"
+  },
+  "goldencorndog": {
+    "name": "Golden Corndog ",
+    "price": "2200000"
+  },
+  "snowball": {
+    "name": "Snowball",
+    "price": "90k"
+  },
+  "santashat": {
+    "name": "Santa’s Hat",
+    "price": "140000"
+  },
+  "snowflake": {
+    "name": "Snowflake",
+    "price": "150000"
+  },
+  "friendsgift": {
+    "name": "Friend’s Gift",
+    "price": "3.68m"
+  },
+  "giftbox": {
+    "name": "Gift Box",
+    "price": "4.89m"
+  },
+  "ornament": {
+    "name": "Ornament",
+    "price": "389000"
+  },
+  "christmastree": {
+    "name": "Christmas Tree",
+    "price": "600000"
+  },
+  "adventurevoucher": {
+    "name": "Adventure Voucher",
+    "price": "1799000"
+  },
+  "sugarskull": {
+    "name": "Sugar Skull",
+    "price": "7150000"
+  },
+  "holidaystocking": {
+    "name": "Holiday Stocking",
+    "price": "23441000"
+  },
+  "chocolatecake": {
+    "name": "Chocolate Cake",
+    "price": "4750000"
+  },
+  "prestigecoin": {
+    "name": "Prestige Coin",
+    "price": "4800000"
+  },
+  "designerhoodie": {
+    "name": "Designer Hoodie",
+    "price": "2480000"
+  },
+  "stonkcoin": {
+    "name": "Stonk Coin",
+    "price": "250000000"
+  },
+  "coinvoucher": {
+    "name": "Coin Voucher",
+    "price": "11000000"
+  }
+}
