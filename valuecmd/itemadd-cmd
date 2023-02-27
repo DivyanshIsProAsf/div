@@ -1,0 +1,39 @@
+[#function;largenum;{=num};{=title};{=description}]
+{=new1;{replace;{$num};m;*1000000}}
+{=new2;{replace;{$new1};b;*1000000000}}
+{=new3;{replace;{$new2};k;*1000}}
+{=new3;{replace;{$new3};,;}}
+{=new;{catch;{math;{$new3}};{return;{responder.embed title="{$title}" description="{$description}"}{responder.error}}}}
+{$new}
+[/function]
+
+{=itemname;{option;item_name}}
+{=itemvalue;{option;item_value}}
+
+{=data1;{store.get;valuedata}}
+{=items1;{join;{keys;{$data1}}; }}
+{=data2;{store.get;valuedata2}}
+{=items2;{join;{keys;{$data2}}; }}
+{=data3;{store.get;valuedata3}}
+{=items3;{join;{keys;{$data3}}; }}
+{=data4;{store.get;valuedata4}}
+{=items4;{join;{keys;{$data4}}; }}
+
+{=itemid;{replace;{casing mode=lower;{$itemname}}; ;}}
+{=data4.{$itemid}.name;{$itemname}}
+{=data4.{$itemid}.price;{largenum;{$itemvalue};Error;The value you input isn't a valid number.}}
+
+{responder.embed 
+  title="New Item Addition"
+  description="`  -  ` Item Name: {$itemname}
+  `  -  ` Item ID: `{$itemid}`
+  `  -  ` Value: `⏣ {formatNumber;{largenum;{$itemvalue}}}`"
+  color="{random length=6;ABCDEF1234567890}"
+  thumbnail=https://emoji.gg/assets/emoji/7809-pepe-noted.gif
+  footer="New item added by {user.tag}"}
+  
+{store.set;valuedata;{$data1}}
+{store.set;valuedata2;{$data2}}
+{store.set;valuedata3;{$data3}}
+{store.set;valuedata4;{$data4}}
+
