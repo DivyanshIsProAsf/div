@@ -1,0 +1,118 @@
+// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. 
+// ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.
+
+// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.
+
+// Calling all the inputs
+{=msgid;{message.referenceId;{message.id}}}
+{=embed;{message.embed;{$msgid}}}
+{=input;{split;{message.content}; }}
+{if;{$input.0};!==;!rlog;{throw}}
+{=rafflename;{or;{$input.2};weeklyraffle}}
+{=user;{user.id;{$input.1}}}
+
+// Calling the storage data
+{=data;{store.get;raffledata}}
+{=datakeys;{keys;{$data}}}
+
+// getting the data from the storage variable
+{=rafflechan;{$data.rafflechan}}
+{=entrychan;{$data.entrychan}}
+{=pingrole;{$data.pingrole}}
+{=pin?;{$data.pin?}}
+{=lock?;{$data.lock?}}
+{=logchan;{$data.logchan}}
+
+// Checking the embed
+{if;{$user};{if;{$embed};
+{=entryticket;500000}
+{=e5;{split;{$embed.description};⏣ }}
+{=amount;{replace;{replace;{$e5.1};*;};,;}}}}
+
+// Getting the number of tickets to be added
+{=e4;{catch;{split;{math;{$amount}/{$entryticket}};.};{throw}}}
+{=entries1;{$e4.0}}
+// Checking if the raffle exists or nah
+[#if;{$datakeys};!includes;{$rafflename}]
+  {throw;
+    {responder.embed
+      title="Error"
+      description="Looks like the raffle name you entered isn't an existing raffle. Please try again!"}
+    {responder.error}}
+[/if]
+
+// Checking if the user is the host
+{=host;{$data.{$rafflename}.host}}
+[#if;{user.hasPermission;ADMINISTRATOR;{user.id}};==;false]
+  {throw;
+    {responder.embed
+     title="Error" 
+     description="You don't have the permissions required to add raffle entries!"}
+    {responder.error}}
+[/if]
+
+// Checking if the raffle is still valid
+{=time;{$data.{$rafflename}.time}}
+[#if;{$time};<=;{time}]
+  {throw;
+    {responder.embed
+      title="Error"
+      description="The raffle name you input has been ended. It ended {time format=R;{$time}}"}
+    {responder.error}}
+[/if]
+
+// Adding the bonus entries
+{=bonus?;{if;{user.roles;{$user}};includes;1051098740850696212;{if;{$data.{$rafflename}.bonususers};!includes;{$user};yes;no};no}}
+{if;{$bonus?};==;yes;{=data.{$rafflename}.bonususers;{$data.{$rafflename}.bonususers} {$user}}}
+{=entries;{if;{$bonus?};==;yes;{math;{$entries1}+5};{$entries1}}}
+{=totalbonus;{$data.{$rafflename}.bonus}}
+{=newbonus;{if;{$bonus?};{math;0{$totalbonus}+5};{math;0{$totalbonus}}}}
+{=data.{$rafflename}.bonus;{$newbonus}}
+
+// Finding user's old entries (if any)
+{=allentries;{$data.{$rafflename}.entries}}
+{=userentries;{catch;{or;{$allentries.{$user}};0};{throw}}}
+
+// Adding user's entries
+{=new;{catch;{math;0{$userentries}+{$entries}};{throw}}}
+{=data.{$rafflename}.entries.{$user};{$new}}
+
+// Getting the entries of the raffle
+{=allentries;{$data.{$rafflename}.entries}}
+{=entrykeys;{keys;{$allentries}}}
+{=info;
+  [#for;{=user1};{$entrykeys}]
+  <:div_replyblue:910527342806450197> {user.tag;{$user1}} - `{$allentries.{$user1}}`
+  [/for]
+}
+
+// Sending the embed
+{responder.embed
+  color="{random length=6;ABCDEF1234560}"
+  timestamp=now
+  footer_icon="{user.avatar}"
+  footer="Entries added by {user.tag}"
+  description="Tickets have been added to {user.tag;{$user}}
+  <:div_dot:910520099084070923> Number of tickets: `{$entries}`
+  <:div_dot:910520099084070923> Total Tickets of {user.mention;{$user}}: `{$new}`
+  <:div_dot:910520099084070923> Raffle ends {time format=R;{$time}}"}
+{responder.send}
+
+// sending the log embed
+{responder.text;`{$entries}` tickets were added to {user.mention;{$user}}{if;{$bonus?}; (+5 bonus)}}
+{responder.channel;{$logchan}}
+{responder.send}
+
+// deleting the old info message and sending the new one
+[#if;{channel.id};==;{$entrychan}]
+  {catch;{responder.embed;{message.embed;{$entrychan}-{$data.{$rafflename}.info}}}}
+  {responder.channel;{$entrychan}}
+  {catch;{message.delete;{$entrychan}-{$data.{$rafflename}.info}}}
+  {responder.channel;{channel.id}}
+  {responder.reference}
+  {=msg1;{responder.send return_id=true}}
+  {=data.{$rafflename}.info;{$msg1}}
+[/if]
+
+// Setting the new storage data
+{store.set;raffledata;{$data}}
