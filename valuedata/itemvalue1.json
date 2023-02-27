@@ -1,0 +1,262 @@
+{
+  "pepemedal": {
+    "name": "Pepe Medal",
+    "price": "2300000"
+  },
+  "pepecrown": {
+    "name": "Pepe Crown",
+    "price": "29000000"
+  },
+  "pepetrophy": {
+    "name": "Pepe Trophy",
+    "price": "10000000"
+  },
+  "blob": {
+    "name": "Blob",
+    "price": "7648083000"
+  },
+  "pepering": {
+    "name": "Pepe Ring",
+    "price": "14000000"
+  },
+  "boxbox": {
+    "name": "Box Box",
+    "price": "58275000"
+  },
+  "grass": {
+    "name": "Grass",
+    "price": "104475000"
+  },
+  "holywater": {
+    "name": "Holy Water",
+    "price": "205000000"
+  },
+  "pepecoin": {
+    "name": "Pepe Coin",
+    "price": "566000"
+  },
+  "pepebox": {
+    "name": "Pepe Box",
+    "price": "10814000"
+  },
+  "banhammer": {
+    "name": "Ban Hammer",
+    "price": "950000"
+  },
+  "ectoplasm": {
+    "name": "Ectoplasm",
+    "price": "2000000"
+  },
+  "motivationalposter": {
+    "name": "Motivational Poster",
+    "price": "7060000"
+  },
+  "energydrink": {
+    "name": " Energy Drink",
+    "price": "5750000"
+  },
+  "beakerofsusfluid": {
+    "name": "Beaker of sus fluid",
+    "price": "8500000"
+  },
+  "binary": {
+    "name": "Binary",
+    "price": "4024000"
+  },
+  "crunchytaco": {
+    "name": "Crunchy Taco",
+    "price": "3236000"
+  },
+  "tipjar": {
+    "name": "Tip Jar",
+    "price": "4760000"
+  },
+  "ammo": {
+    "name": "Ammo",
+    "price": "1950000"
+  },
+  "bottleofwhiskey": {
+    "name": "Bottle of Whiskey",
+    "price": "1865000"
+  },
+  "likebutton": {
+    "name": "Like Button",
+    "price": "1237000"
+  },
+  "vaccine": {
+    "name": "Vaccine",
+    "price": "9000000"
+  },
+  "baby": {
+    "name": "Baby",
+    "price": "1000000"
+  },
+  "useddiaper": {
+    "name": "Used Diaper",
+    "price": "2400000"
+  },
+  "fishingbait": {
+    "name": "Fishing Bait",
+    "price": "1676000"
+  },
+  "robbersmask": {
+    "name": "Robbers Mask",
+    "price": "5168000"
+  },
+  "policebadge": {
+    "name": "Police Badge",
+    "price": "900000"
+  },
+  "musicalnote": {
+    "name": "Musical Note",
+    "price": "7657000"
+  },
+  "stonkmachine": {
+    "name": "Stonk Machine",
+    "price": "11100000"
+  },
+  "stackofcash": {
+    "name": "Stack of Cash",
+    "price": "4369000"
+  },
+  "memepills": {
+    "name": "Meme pills",
+    "price": "8500000"
+  },
+  "aplus": {
+    "name": "A plus",
+    "price": "8208000"
+  },
+  "petcollar": {
+    "name": "Pet Collar",
+    "price": "4750000"
+  },
+  "lawdegree": {
+    "name": "Law Degree",
+    "price": "8300000.000000001"
+  },
+  "shopcoupon": {
+    "name": "Shop Coupon",
+    "price": "799000"
+  },
+  "pinkplasticbits": {
+    "name": "Pink Plastic Bits",
+    "price": "40"
+  },
+  "blueplasticbits": {
+    "name": "Blue Plastic Bits",
+    "price": "24000"
+  },
+  "purpleplasticbits": {
+    "name": "Purple Plastic Bits",
+    "price": "401000"
+  },
+  "orangeplasticbits": {
+    "name": "Orange Plastic Bits",
+    "price": "241000"
+  },
+  "goldenplasticbits": {
+    "name": "Golden Plastic Bits",
+    "price": "175000"
+  },
+  "coloredmultibits": {
+    "name": "Colored Multi Bits",
+    "price": "624000"
+  },
+  "rarepepe": {
+    "name": "Rare Pepe",
+    "price": "55000"
+  },
+  "pepestatue": {
+    "name": "Pepe Statue",
+    "price": "100000"
+  },
+  "mouse": {
+    "name": "Mouse",
+    "price": "73000"
+  },
+  "ringlight": {
+    "name": "Ring Light",
+    "price": "5719000"
+  },
+  "headphones": {
+    "name": "Headphones",
+    "price": "2603000"
+  },
+  "camera": {
+    "name": "Camera",
+    "price": "1500000"
+  },
+  "microphone": {
+    "name": "Microphone",
+    "price": "5000000"
+  },
+  "soundcard": {
+    "name": "Sound Card",
+    "price": "12882000"
+  },
+  "greenscreen": {
+    "name": "Green Screen",
+    "price": "2121000"
+  },
+  "aetheryxflower": {
+    "name": "Aetheryx' Flower",
+    "price": "1300000"
+  },
+  "badoszscard": {
+    "name": "Badosz's Card",
+    "price": "3283000"
+  },
+  "bluesplane": {
+    "name": "Blue's Plane",
+    "price": "1.1m"
+  },
+  "bunnysapron": {
+    "name": "Bunny's Apron",
+    "price": "1331000"
+  },
+  "zigscapybara": {
+    "name": "Zig's Capybara",
+    "price": "963000"
+  },
+  "alexasmegaphone": {
+    "name": "Alexa's Megaphone",
+    "price": "4023000"
+  },
+  "townieseyes": {
+    "name": "Townie's Eyes",
+    "price": "4484000"
+  },
+  "amathinesbutterfly": {
+    "name": "Amathine's Butterfly",
+    "price": "98000000"
+  },
+  "kablessunglasses": {
+    "name": "Kable's Sunglasses",
+    "price": "3285000"
+  },
+  "melmsiesbeard": {
+    "name": "Melmsie's Beard",
+    "price": "6900000"
+  },
+  "holybadoszsbread": {
+    "name": "Holy Badosz's Bread",
+    "price": "155609000"
+  },
+  "bean": {
+    "name": "Bean",
+    "price": "50000"
+  },
+  "beanmp3player": {
+    "name": "Bean MP3 Player",
+    "price": "27486000"
+  },
+  "aipheysgemstones": {
+    "name": "Aiphey's Gemstones",
+    "price": "1381000"
+  },
+  "broccoli": {
+    "name": "Broccoli",
+    "price": "135000"
+  }
+}
