@@ -1,0 +1,45 @@
+// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. 
+//ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.
+
+// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.
+
+// Calling all the inputs
+{=rafflename;{or;{$input.2};weeklyraffle}}
+
+// Calling the storage variable
+{=data;{store.get;raffledata}}
+
+// getting the data from the storage variable
+{=rafflechan;{$data.rafflechan}}
+{=entrychan;{$data.entrychan}}
+{=pingrole;{$data.pingrole}}
+{=pin?;{$data.pin?}}
+{=lock?;{$data.lock?}}
+
+// Getting the entries of the raffle
+{=allentries;{$data.{$rafflename}.entries}}
+{=entrykeys;{keys;{$allentries}}}
+
+// Getting the total entries
+{=output;{[]}}
+{for;{=user};{$entrykeys};{push;{$output};{$allentries.{$user}}}}
+{=output;{join;{$output};+}}
+{=total;{math;{$output}}}
+
+// Getting the data on who has which ticket.
+{=allentries;{$data.{$rafflename}.entries}}
+{=ticketCount;{[0]}}
+
+// finding the total prize to the winner
+{=bonus;{$data.{$rafflename}.bonus}}
+{=validentries;{math;{$total}-0{$bonus}}}
+{=jackpot;{math;{$validentries}*500000*0.85}}
+
+// Embed for the winner.
+{responder.embed
+  color="{random length=6;ABCDEF1234560}"
+  title="Lottery Information"
+  description="<:div_dot:910520099084070923> Total Entries: `{$total}`
+  <:div_dot:910520099084070923> Bonus Entries: `{$bonus}`
+  <:div_dot:910520099084070923> Total Entries Value: `⏣ {formatNumber;{math;{$validentries}*500000}}`
+  <:div_dot:910520099084070923> Prize Pool for winner: `⏣ {formatNumber;{$jackpot}}`}
