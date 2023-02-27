@@ -1,0 +1,68 @@
+[#function;largenum;{=num};{=title};{=description}]
+{=new1;{replace;{$num};m;*1000000}}
+{=new2;{replace;{$new1};b;*1000000000}}
+{=new3;{replace;{$new2};k;*1000}}
+{=new3;{replace;{$new3};,;}}
+{=new;{catch;{math;{$new3}};{return;{responder.embed title="{$title}" description="{$description}"}{responder.error}}}}
+{$new}
+[/function]
+
+{=ppl;{message.content;922528139018645564-1071127265955565571}}
+[#if;{$ppl};!includes;{user.id}]
+{responder.text;{message.content;899625234808860683-1071118906632192071}
+**Please run this command again to view the value!**}
+{responder.ephemeral}
+{responder.send}
+{responder.text;{$ppl} {user.id}}
+{responder.edit;922528139018645564-1071127265955565571}
+{responder.send ignore_interaction=true}
+{return}
+[/if]
+
+{=input;{option;input}}
+{=input;{replace;{replace;{$input}; ,;,};, ;,}}
+{=split;{split;{$input};,}}
+{=data;{store.get;valuedata}}
+{=items;{join;{keys;{$data}}; }}
+{=data2;{store.get;valuedata2}}
+{=items2;{join;{keys;{$data2}}; }}
+{=data3;{store.get;valuedata3}}
+{=items3;{join;{keys;{$data3}}; }}
+{=data4;{store.get;valuedata4}}
+{=items4;{join;{keys;{$data4}}; }}
+
+{=embed;{[]}}
+{=total;{[]}}
+{=number;{[]}}
+
+[#for;{=input1};{$split}]
+  {=split;{split;{$input1}; }}
+  {=split;{if;{$split.0};==;;{slice;{$split};1};{$split}}}
+  {=length;{length;{$split}}}
+  {=type1;{if;{$length};==;1;1item;{if;{catch;{formatNumber;{$split.0}}};1num;1item}}}
+  {=type2;{if;{$length};==;2;{if;{$type1};==;1num;2item;2num};none}}
+  {=item;{casing mode=lower;{if;{$type1};==;1item;{$split.0};{$split.1}}}}
+  {=amount;{largenum;{if;{$type1};==;1num;{$split.0};{if;{$type2};==;2num;{$split.1};1}}}}
+  {=amount;{catch;{$amount}};{return;{responder.error;Invalid Amount!}}}
+  {=itemfinder;{if;{$items};includes;{$item};{replace;{find;{$items};/([^\s]*{$item}[^\s]*)\s?/i}; ;};{if;{$items2};includes;{$item};{replace;{find;{$items2};/([^\s]*{$item}[^\s]*)\s?/i}; ;};{if;{$items3};includes;{$item};{replace;{find;{$items3};/([^\s]*{$item}[^\s]*)\s?/i}; ;};{if;{$items4};includes;{$item};{replace;{find;{$items4};/([^\s]*{$item}[^\s]*)\s?/i}; ;};{return;{responder.error;Invalid Item!}}{break}}}}}}
+  {if;{$items};includes;{$item};{=price;{$data.{$itemfinder}.price}} {=name;{$data.{$itemfinder}.name}};{if;{$items2};includes;{$item};{=price;{$data2.{$itemfinder}.price}} {=name;{$data2.{$itemfinder}.name}};{if;{$items3};includes;{$item};{=price;{$data3.{$itemfinder}.price}} {=name;{$data3.{$itemfinder}.name}};{if;{$items4};includes;{$item};{=price;{$data4.{$itemfinder}.price}} {=name;{$data4.{$itemfinder}.name}}}}}}
+  {=num;{pop;{$number}}}
+  {push;{$number};{math;0{$num}+1}} 
+  {if;{$number.0};!>=;20;
+  {push;{$embed};`{formatNumber;{$amount}}x` {$name} : `⏣ {formatNumber;{math;{largenum;{$price}}*{$amount}}}`}}
+  {push;{$total};{math;{largenum;{$price}}*{$amount}}}
+[/for]
+
+{=desc;{join;{$embed};
+}}
+{=totalval;{math;{join;{$total};+}}}
+
+
+{responder.embed 
+color="{random length=6;ABCDEF1234567890}"
+title="Item Value"
+description="{snippet maxLength=2048;{$desc}}"
+thumbnail=https://emoji.gg/assets/emoji/7809-pepe-noted.gif}
+{responder.embedField
+ name="Total Item Value:"
+ value="`⏣ {formatNumber;{$totalval}}`"}
