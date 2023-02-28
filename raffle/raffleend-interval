@@ -1,0 +1,114 @@
+// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. 
+//ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.
+
+// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.
+
+// Calling all the inputs
+{=rafflename;weeklyraffle}
+
+// Calling the storage variable
+{=data;{store.get;raffledata}}
+
+// getting the data from the storage variable
+{=rafflechan;{$data.rafflechan}}
+{=entrychan;{$data.entrychan}}
+{=pingrole;{$data.pingrole}}
+{=pin?;{$data.pin?}}
+{=lock?;{$data.lock?}}
+
+// Checking if the raffle exists or nah
+{=datakeys;{keys;{$data}}}
+[#if;{$datakeys};!includes;{$rafflename}]
+  {return;
+    {responder.embed
+      title="Error"
+      description="Looks like the raffle name you entered isn't an existing raffle. Please try again!"}
+    {responder.error}}
+[/if]
+
+// Getting the entries of the raffle
+{=allentries;{$data.{$rafflename}.entries}}
+{=entrykeys;{keys;{$allentries}}}
+
+// Getting the total entries
+{=output;{[]}}
+{for;{=user};{$entrykeys};{push;{$output};{$allentries.{$user}}}}
+{=output;{join;{$output};+}}
+{=total;{math;{$output}}}
+
+// Getting the data on who has which ticket.
+{=allentries;{$data.{$rafflename}.entries}}
+{=ticketCount;{[0]}}
+
+// Getting the data on who has which ticket for the function in that format
+{=allentries;{$data.{$rafflename}.entries}}
+{=ticketCount;{[0]}}
+{=obj;{{}}}
+[#for;{=user};{$entrykeys}]
+    {=number;{$allentries.{$user}}}
+    {=tCount;{shift;{$ticketCount}}}
+    {=obj.{$user};{if;{$number};<=;1;{math;0{$tCount}+1};{math;{$tCount}+{$number}}}}
+    {push;{$ticketCount};{math;{$tCount}+{$number}}}
+[/for]
+
+// Rolling the raffle
+{=winnerticket;{randomInt;1;{$total}}}
+
+// the function for the winning ticket
+[#function;nextNum;{=number};{=array}]
+   {=winningNum;{$number}}
+   {=arr; {join;{$array};  } }
+   {=temp;{split;{$winningNum};}}
+   {=first;{shift;{$temp}}}
+   {=regexTemp;{random length={length;{$temp}};{[\d]}}}
+   {=regex;[^\d]({$first}{if;{$temp.0};[{join;{$temp};-9][}-9]|{$first}[{math;{$temp.0}+1}-9]{random length={math;{length;{$temp}}-1};{[\d]}}}|{if;{$first};!=;9;[{math;{$first}+1}-9]{$regexTemp}|}\d?\d?\d\d{$regexTemp})[^\d]}
+   {=list;{sort;{find return_all;{$arr};/{$regex}/g;1}}}
+   {return;{$list.0}}
+[/function]
+{=winner;{find;{$obj};/"(\d\{16,\})":\s?"?{nextNum;{$winnerticket};{find return_all;{$obj};/:\s?"?(\d+)/g;1}}/;1}}
+
+// finding the total prize to the winner
+{=bonus;{$data.{$rafflename}.bonus}}
+{=validentries;{math;{$total}-0{$bonus}}}
+{=jackpot;{math;{$validentries}*500000*0.85}}
+
+// Embed for the winner.
+{responder.text;{role.mention allow_mention;{$pingrole}} | {user.mention allow_mention;{$winner}}}
+{responder.embed
+  color="{random length=6;ABCDEF1234560}"
+  title="Lottery Winner!"
+  description="<:div_dot:910520099084070923> The weekly lottery has ended!!
+  <:div_dot:910520099084070923> **The winner of the lottery is {user.mention;{$winner}}**
+  <:div_dot:910520099084070923> The winning ticket is `{$winnerticket}`.
+  <:div_dot:910520099084070923> No. of tickets bought by winner: `{$data.{$rafflename}.entries.{$winner}}`}
+
+{responder.button disabled=true style=success label="Prize: ⏣ {formatNumber;{$jackpot}}" handler=ee state=1}
+{responder.button disabled=true style=danger label="Total Entries: {formatNumber;{$total}}" handler=ee state=2}
+{responder.channel;{$rafflechan}}
+
+  
+// unpinning it
+[#if;{$pin?};==;yes]
+  {catch;{message.unpin;{$rafflechan}-{$data.{$rafflename}.log}}}
+[/if]
+
+// Unlocking the channel.
+[#if;{$lock?};==;yes]
+  {catch;{/lock channel={$entrychan}}}
+[/if]
+
+// DMing the winner
+{responder.embed 
+  title="Congratulations!"
+  description="Congratulations **{user.username;{$winner}}** on winning the weekly lottery in **{guild.name}**
+  You have won the jackpot of `⏣ {formatNumber;{$jackpot}}`!"
+  color="{random length=6;ABCDEF1234567890}"}
+{responder.dm;{$winner}}
+{responder.send}
+
+// DMing the host
+{responder.embed
+  title="The weekly raffle has ended"
+  description="The weekly lottery has ended and the winner is {user.mention;{$winner}}
+  They won the jackpot of `⏣ {formatNumber;{$jackpot}}`"}
+{responder.dm;{$data.{$rafflename}.host}}
