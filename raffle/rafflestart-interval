@@ -1,0 +1,45 @@
+{=data;{store.get;status}}
+{if;{$data.0};!==;enabled;{return}}
+{if;{$data.1};!includes;{user.id};{return}}
+
+{=embed;{message.embed;{$data.2}}}
+{=stafflist;{$embed.fields.0.value}}
+{=e;{split;{$stafflist};\n}}
+{=field2;{split;{$embed.fields.1.value};\n}}
+{=field3;{split;{$embed.fields.2.value};\n}}
+
+{=ee;0}
+{=index;-}
+[#for;{=data11};{$e}]
+   {=index;{if;{$data11};includes;<@{user.id}>;{math;0{$ee}}{break}}}
+   {=ee;{math;0{$ee}+1}}
+[/for]
+{if;{$index};==;-;{throw;err}}
+//
+{=eee;{store.get;status}}
+{=userss;{$eee.1}}
+
+// Checking the input
+{=input;{message.content}}
+{=isurl?;{isUrl;{$input}}}
+{if;{$isurl?};==;false;{throw;error}}
+
+// Checking if they submitted one task
+{=e1;{$field2.{$index}}}
+{=e2;{$field3.{$index}}}
+{if;{$e1};!==;<:tick:1074267032155078696>;{if;{$e2};!==;<:tick:1074267032155078696>;{message.delete}{=data.1;{replace;{$data.1};{user.id};}}{store.set;status;{$data}}{return;{responder.error;You have already submitted two tasks!}}}}
+{if;{$e1};!==;<:tick:1074267032155078696>;{if;{$e2};==;<:tick:1074267032155078696>;
+  {=field3.{$index};<:greentick:1074267388901597231> [Event]({message.content})}
+  {=data.1;{replace;{$data.1};{user.id};}}}
+  {message.delete}}
+{if;{$e1};==;<:tick:1074267032155078696>;
+  {=field2.{$index};<:greentick:1074267388901597231> [Event]({message.content})}
+  {=data.1;{replace;{$data.1};{user.id};}}
+  {message.delete}}
+{responder.text;{time format=R;1 minute}}
+// Making the new embed
+{=embed.fields.1.value;{join;{$field2};\n}}
+{=embed.fields.2.value;{join;{$field3};\n}}
+{responder.embed;{$embed}}
+{responder.edit;{$eee.2}}
+{store.set;status;{$data}}
