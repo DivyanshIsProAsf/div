@@ -1,0 +1,26 @@
+{=embed;{message.embed}}
+{=stafflist;{$embed.fields.0.value}}
+{=e;{split;{$stafflist};\n}}
+{=field2;{split;{$embed.fields.1.value};\n}}
+{=field3;{split;{$embed.fields.2.value};\n}}
+
+{=ee;}
+{=index;-}
+[#for;{=data};{$e}]
+   {=index;{if;{includes;{$e};<@{user.id}>};{math;0{$ee}}}}
+   {=ee;{math;0{$ee}+1}}
+[/for]
+{if;{$index};==;-;{return;{responder.error;e}}}
+
+//
+{=eee;{store.get;status}}
+{=userss;{$eee.1}}
+
+// Checking if they submitted one task
+{=e1;{$field2.{$index}}}
+{if;{$e1};!==;<:tick:1074267032155078696>;{if;{$e2};!==;<:tick:1074267032155078696>;{return;{responder.error;You have already submitted two tasks!}}}}
+{=eee.1;{$eee.1} {user.id}}
+{=eee.0;enabled}
+{=eee.2;{message.id}}
+{store.set;status;{$eee}}
+{responder.error;Please send the message link in the chat! Please make sure you send it otherwise it will automaticall timeout for 5 minutes!}
