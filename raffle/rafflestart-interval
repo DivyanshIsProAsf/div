@@ -1,45 +1,97 @@
-{=data;{store.get;status}}
-{if;{$data.0};!==;enabled;{return}}
-{if;{$data.1};!includes;{user.id};{return}}
+// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. 
+//ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.
 
-{=embed;{message.embed;{$data.2}}}
-{=stafflist;{$embed.fields.0.value}}
-{=e;{split;{$stafflist};\n}}
-{=field2;{split;{$embed.fields.1.value};\n}}
-{=field3;{split;{$embed.fields.2.value};\n}}
+// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.
 
-{=ee;0}
-{=index;-}
-[#for;{=data11};{$e}]
-   {=index;{if;{$data11};includes;<@{user.id}>;{math;0{$ee}}{break}}}
-   {=ee;{math;0{$ee}+1}}
-[/for]
-{if;{$index};==;-;{throw;err}}
-//
-{=eee;{store.get;status}}
-{=userss;{$eee.1}}
+// Calling all the inputs from the options
+{=host;823904633944539196}
+{=prizecoins;100}
+{=prizeitemquantity;{catch;{option;prize_item_quantity}}}
+{=prizeitemquantity;{if;{$prizeitemquantity};{$prizeitemquantity};1}}
+{=prizeitemname;{catch;{option;prize_item_name}}}
+{=ticketitemquantity;{catch;{option;ticket_item_quantity}}}
+{=ticketitemquantity;{if;{$ticketitemquantity};{$ticketitemquantity};1}}
+{=ticketitemname;{catch;{option;ticket_item_name}}}
+{=ticketcoins;500000}
+{=rafflename;weeklyraffle}
+{=time;next wednesday 5.30pm utc+5:30}
 
-// Checking the input
-{=input;{message.content}}
-{=isurl?;{isUrl;{$input}}}
-{if;{$isurl?};==;false;{throw;error}}
+// calling the raffle storage data
+{=data;{store.get;raffledata}}
 
-// Checking if they submitted one task
-{=e1;{$field2.{$index}}}
-{=e2;{$field3.{$index}}}
-{if;{$e1};!==;<:tick:1074267032155078696>;{if;{$e2};!==;<:tick:1074267032155078696>;{message.delete}{=data.1;{replace;{$data.1};{user.id};}}{store.set;status;{$data}}{return;{responder.error;You have already submitted two tasks!}}}}
-{if;{$e1};!==;<:tick:1074267032155078696>;{if;{$e2};==;<:tick:1074267032155078696>;
-  {=field3.{$index};<:greentick:1074267388901597231> [Event]({message.content})}
-  {=data.1;{replace;{$data.1};{user.id};}}}
-  {message.delete}}
-{if;{$e1};==;<:tick:1074267032155078696>;
-  {=field2.{$index};<:greentick:1074267388901597231> [Event]({message.content})}
-  {=data.1;{replace;{$data.1};{user.id};}}
-  {message.delete}}
-{responder.text;{time format=R;1 minute}}
-// Making the new embed
-{=embed.fields.1.value;{join;{$field2};\n}}
-{=embed.fields.2.value;{join;{$field3};\n}}
-{responder.embed;{$embed}}
-{responder.edit;{$eee.2}}
-{store.set;status;{$data}}
+// getting the data from the storage variable
+{=rafflechan;{$data.rafflechan}}
+{=entrychan;{$data.entrychan}}
+{=pingrole;{$data.pingrole}}
+{=pin?;{$data.pin?}}
+{=lock?;{$data.lock?}}
+
+// clearing the old data (if any)
+{=data.{$rafflename};}
+// Running error check on the time
+{=time1;{catch;{time;{$time}};{return;{responder.embed title=Error description="Invalid time! Please try again."}{responder.error}}}}
+
+// Sending the embed if the ticket type is invalid.
+{=tickettype;{or;{$ticketcoins};{$ticketitemname};{$ticketitemquantity}}}
+{=tickettype2;{if;{$tickettype};{if;{$tickettype};==;{$ticketcoins};ticket_coins;{if;{$tickettype};==;{$ticketitemname};ticket_item;ticket_item_error}};ticket_error_empty}}
+
+//Sending the embed if the prize type is invalid.
+{=prizetype;{or;{$prizecoins};{$prizeitemname};{$prizeitemquantity}}}
+{=prizetype2;{if;{$prizetype};{if;{$prizetype};==;{$prizecoins};prize_coins;{if;{$prizetype};==;{$prizeitemname};prize_item;prize_item_error}};prize_error_empty}}
+
+// the type of input and the input
+{=prizetype;{if;{$prizetype};==;{$prizeitemname};`{formatNumber;{$prizeitemquantity}}` {$prizeitemname};`⏣ {formatNumber;{$prizecoins}}`}}
+{=tickettype;{if;{$tickettype};==;{$ticketitemname};`{formatNumber;{$ticketitemquantity}}` {$ticketitemname};`⏣ {formatNumber;{$ticketcoins}}`}}
+
+// Starting the raffle
+[#if;{$valid};==;yes]
+{=data.{$rafflename}.host;{$host}}
+{=data.{$rafflename}.prize;{$prizetype}}
+{=data.{$rafflename}.ticket;{$tickettype}}
+[/if]
+
+// Making the embed which is going to be sent in the channel.
+  {responder.embed
+    title="Lottery Information"
+    description="The weekly lottery has been started!! 
+    <:div_dot:910520099084070923> Lottery ends at <t:{$time1}:F> (<t:{$time1}:R>)
+    <:div_dot:910520099084070923> Entry ticket: {$tickettype}
+    <:div_dot:910520099084070923> The tickets will be added by an admin soon:tm:!
+
+    <:div_dot:910520099084070923> All entries must be sent using </serverevents:1011560371267579936> donate in {channel.mention;{$entrychan}} only!"
+    color="{random length=6;ABCDEF1234560}"}
+  {responder.channel;{$rafflechan}}
+
+//Sending the new embed
+{=msg;{responder.send return_id=true}}
+
+// sending info embed in the entry channel
+  {responder.embed
+    title="Lottery Information"
+    description="<:div_dot:910520099084070923> Ends at: <t:{$time1}:F> (<t:{$time1}:R>)
+    <:div_dot:910520099084070923> Entry Fee: {$tickettype}
+    <:div_dot:910520099084070923> Send your tickets to serverpool only."
+    color="{random length=6;ABCDEF1234560}"}
+  {responder.channel;{$entrychan}}
+  {=msg1;{responder.send return_id=true}}
+
+// pinning it
+[#if;{$pin?};==;yes]
+  {message.pin;{$rafflechan}-{$msg}}
+[/if]
+
+//Unlocking the entry channel
+[#if;{$lock?};==;yes]
+  {/lock channel="{$entrychan}"}
+[/if]
+
+// Setting the data on the variable
+{=data.{$rafflename}.log;{$msg}}
+{=data.{$rafflename}.info;{$msg1}}
+{=data.{$rafflename}.host;{user.mention;{$host}}}
+{=data.{$rafflename}.time;{time;{$time}}}
+{=data.{$rafflename}.ticket;{$tickettype}}
+{=data.{$rafflename}.prize;{$prizetype}}
+
+// Setting the variable
+{store.set;raffledata;{$data}}
