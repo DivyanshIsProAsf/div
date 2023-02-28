@@ -1,0 +1,33 @@
+{=event;{[633692362153000960;890439278117666816;679966717807689728;724935754672766988;774997316796547072;823904633944539196;874073604189478943;370943880767471617;913622854254358599;710289512823128104;1001726294091890718;366235233311391768;813700323046195250]}}
+{=gaw;{[773956928967278612;1039611018491469924;759204241016356916;759204241016356916;914913124367339593]}}
+
+{=em.event;{[]}}
+{=em.eee;{[]}}
+{=em.eeg;{[]}}
+[#for;{=user};{$event}]
+  {push;{$em.eee};<:tick:1074267032155078696>}
+  {push;{$em.event};{user.mention;{$user}} - Event 1 [<:tick:1074267032155078696>], Event 2 [<:tick:1074267032155078696>]}
+[/for]
+
+{=em.gaw;{[]}}
+[#for;{=user};{$gaw}]
+  {push;{$em.eeg};<:tick:1074267032155078696>}
+  {push;{$em.gaw};{user.mention;{$user}} - Giveaway 1 [<:tick:1074267032155078696>], Giveaway 2 [<:tick:1074267032155078696>]}
+[/for]
+
+{responder.embed 
+  description=yes}
+{responder.embedField
+  name="Event Staff"
+  inline=true
+  value="<@{join;{$event};>\n<@}>"}
+{responder.embedField
+  name="Event 1"
+  value="{join;{$em.eee};\n}"
+  inline=true}
+{responder.embedField
+  inline=true
+  name="Event 2"
+  value="{join;{$em.eee};\n}"}
+
+{responder.button label="Claim Event" style=success state="{user.id}" handler=staff}
