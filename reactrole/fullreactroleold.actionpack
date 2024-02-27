@@ -1,0 +1,257 @@
+{
+  "comment": "Exported from https://atlas.bot",
+  "formatVersion": 2,
+  "exportedAt": "2024-02-11T06:02:16.817Z",
+  "actions": [
+    {
+      "trigger": {
+        "type": "ComponentCallback",
+        "handlerName": "my-callback",
+        "editOriginal": false,
+        "disableComponent": false
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// returning if its a test select menu\r\n{if;{$state};includes;test;{return;{responder.error;This would contain the output intended!}}}\r\n\r\n// Calling the inputs\r\n{=state1;{split;{$state};-}}\r\n{=len;{length;{$state1}}}\r\n{=role;{if;{$len};==;2;{$values};{[{$state1.2}]}}}\r\n{=grp;{$state1.1}}\r\n\r\n// Calling the storage\r\n{=data;{store.get;reactroledata}}\r\n\r\n// THE DATA FOR EDIT CMD STARTS HERE\r\n[#if;{$state1.0};==;edit]\r\n[#if;{$state1.1};==;grp]\r\n{=grp;{$value}}\r\n{=roleid;{$data.{$grp}.roles.0.id}}\r\n{responder.error;Grp: {$grp}\r\nRoleid: {$roleid}}{responder.send}\r\n\r\n// making the select menu for group\r\n{=stuff;{[]}}\r\n[#for;{=grpid};{keys;{$data}}]\r\n   {=e.label;{$grpid}}\r\n   {=e.value;{$grpid}}\r\n   {=e.description;Reactrole Type: {$data.{$grpid}.type}}\r\n   {if;{$grpid};==;{$grp};{=e.default;true}}\r\n   {push;{$stuff};{$e}}\r\n[/for]\r\n\r\n// making select menu for role\r\n{=stuff1;{[]}}\r\n{=roles1;{[]}}\r\n[#for;{=rolei};{$data.{$grp}.roles}]\r\n  {=e.label;{role.name;{$rolei.id}}}\r\n  {=e.value;{$rolei.id}}\r\n  {=e.description;ID: {$rolei.id}}\r\n  {if;{$rolei.id};==;{$roleid};{=e.default;true}}\r\n  {push;{$stuff1};{$e}}\r\n\r\n  {=e1;{math;{length;{$roles1}}+1}) {role.name;{$rolei.id}}}\r\n  {if;{$rolei.id};==;{$roleid};{=e1;**{$e1}**}}\r\n  {push;{$roles1};{$e1}}\r\n[/for]\r\n\r\n{responder.embed\r\n  color=\"{role.color;{$roleid}}\"\r\n  thumbnail=\"{guild.icon}\"\r\n  title=\"Reaction Role List\"\r\n  description=\"<:div_dot:910520099084070923> Group Name: `{$grp}`\r\n  <:div_dot:910520099084070923> Group Type: {$data.{$grp}.type}\r\n  <:div_dot:910520099084070923> Click on the Red Button to delete this role from the reactrole!\r\n  <:div_dot:910520099084070923>** Please note that deleting any group or role is IRREVERSIBLE and cannot be changed**\"}\r\n{responder.embedField\r\n  name=\"Role Info\"\r\n  value=\"<:div_dot:910520099084070923> Role: {role.mention;{$roleid}} | {$roleid}\r\n  <:div_dot:910520099084070923> Emoji: {or;{$data.{$grp}.roles.[id:{$roleid}].emoji};{$data.{$grp}.defaultemoji} (Default Group Emoji);None}\r\n  <:div_dot:910520099084070923> Description: {or;{$data.{$grp}.roles.[id:{$roleid}].desc};{$data.{$grp}.defaultdesc} (Default Group Desc);None}\r\n  <:div_dot:910520099084070923> Reply: {or;{$data.{$grp}.roles.[id:{$roleid}].msg};{$data.{$grp}.defaultmsg} (Default Group Desc);None}\"}\r\n{responder.edit;{message.id}}\r\n\r\n// making the edit grp select menu\r\n{responder.select state=\"edit-grp-{$grp}\" handler=my-callback;{$stuff}}\r\n\r\n// making the select role menu\r\n{responder.select state=\"edit-role-{$grp}\" handler=my-callback actionRowIndex=1;{$stuff1}}\r\n\r\n// making embed fr deleting role\r\n  {responder.button\r\n     style=danger\r\n     emoji=⚠️\r\n     label=\"Delete Role\"\r\n     handler=reactrole\r\n     state=\"edit-{$roleid}-{$grp}-delete-role\"\r\n     actionRowIndex=2}\r\n    {responder.button\r\n     style=danger\r\n     emoji=⚠️\r\n     label=\"Delete Group\"\r\n     handler=reactrole\r\n     state=\"edit-{$roleid}-{$grp}-delete-grp\"\r\n     actionRowIndex=2}\r\n\r\n[/if]\r\n[/if]",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "reactrole view",
+        "description": "A very cool and useful custom command",
+        "parameters": [
+          {
+            "name": "reactrole_group",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// getting the inputs and storage\r\n{=data;{store.get;reactroledata}}\r\n{=grp;{option;reactrole_group}}\r\n\r\n// Retrieving basic data from storage\r\n{=grps;{keys;{$data}}}\r\n\r\n// Checking if the group exists\r\n[#if;{$grps};!includes;{$grp}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The react role group you mentioned doesn't exist! If you would like to create a new reactrole group please run `/reactrole create_group`\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// SELECT MENU CONTENT STARTS FROM HERE\r\n// making the select menu for group\r\n{=stuff;{[]}}\r\n[#for;{=grpid};{$grps}]\r\n   {=e.label;{$grpid}}\r\n   {=e.value;{$grpid}}\r\n   {=e.description;Reactrole Type: {$data.{$grpid}.type}}\r\n   {if;{$grpid};==;{$grp};{=e.default;true}}\r\n   {push;{$stuff};{$e}}\r\n[/for]\r\n\r\n// getting the first role in the group\r\n{=roles;{$data.{$grp}.roles}}\r\n{=roleid;{$roles.0.id}}\r\n\r\n// making select menu for role\r\n{=stuff1;{[]}}\r\n{=roles1;{[]}}\r\n[#for;{=rolei};{$data.{$grp}.roles}]\r\n  {=e.label;{role.name;{$rolei.id}}}\r\n  {=e.value;{$rolei.id}}\r\n  {=e.description;ID: {$rolei.id}}\r\n  {if;{$rolei.id};==;{$roleid};{=e.default;true}}\r\n  {push;{$stuff1};{$e}}\r\n\r\n  {=e1;{math;{length;{$roles1}}+1}) {role.name;{$rolei.id}}}\r\n  {if;{$rolei.id};==;{$roleid};{=e1;**{$e1}**}}\r\n  {push;{$roles1};{$e1}}\r\n[/for]\r\n\r\n// making the embed\r\n{responder.embed\r\n  color=\"{role.color;{$roleid}}\"\r\n  thumbnail=\"{guild.icon}\"\r\n  title=\"Reaction Role List\"\r\n  description=\"<:div_dot:910520099084070923> Group Name: `{$grp}`\r\n  <:div_dot:910520099084070923> Group Type: {$data.{$grp}.type}\r\n  <:div_dot:910520099084070923> Click on the Red Button to delete this role from the reactrole!\"\r\n  footer=\"Please note that deleting any group or role is IRREVERSIBLE and cannot be changed\"}\r\n{responder.embedField\r\n  name=\"Role Info\"\r\n  value=\"<:div_dot:910520099084070923> Role: {role.mention;{$roleid}} | {$roleid}\r\n  <:div_dot:910520099084070923> Emoji: {or;{$data.{$grp}.roles.[id:{$roleid}].emoji};{$data.{$grp}.defaultemoji};None}\r\n  <:div_dot:910520099084070923> Description: {or;{$data.{$grp}.roles.[id:{$roleid}].desc};{$data.{$grp}.defaultdesc};None}\r\n  <:div_dot:910520099084070923> Reply: {or;{$data.{$grp}.roles.[id:{$roleid}].msg};{$data.{$grp}.defaultmsg};None}\"}\r\n\r\n// making the edit grp select menu\r\n{responder.select state=\"edit-grp-{$grp}\" handler=reactrole;{$stuff}}\r\n\r\n// making the select role menu\r\n{responder.select state=\"edit-role-{$grp}\" handler=reactrole actionRowIndex=1;{$stuff1}}\r\n\r\n// making embed fr deleting role\r\n  {responder.button\r\n     style=danger\r\n     emoji=⚠️\r\n     label=\"Delete Role\"\r\n     handler=reactrole\r\n     state=\"edit-{$roleid}-{$grp}-delete-role\"\r\n     actionRowIndex=2}\r\n    {responder.button\r\n     style=danger\r\n     emoji=⚠️\r\n     label=\"Delete Group\"\r\n     handler=reactrole\r\n     state=\"edit-{$roleid}-{$grp}-delete-grp\"\r\n     actionRowIndex=2}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "reactrole add group",
+        "description": "A very cool and useful custom command",
+        "parameters": [
+          {
+            "name": "reactrole_group",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "select_menu",
+            "type": "Boolean",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "default_message",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "default_emoji",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "default_description",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// Calling the inputs\r\n{=grp;{option;reactrole_group}}\r\n{=msg;{option;default_message}}\r\n{=emoji;{option;default_emoji}}\r\n{=select;{option;select_menu}}\r\n{=desc;{option;default_description}}\r\n\r\n// Calling the data from the storage\r\n{=data;{store.get;reactroledata}}\r\n{=grps;{keys;{$data}}}\r\n\r\n// Checking if the reactrole already exists or not\r\n[#if;{$grps};includes;{$grp}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The react role group you mentioned already exists. Please try again later.\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the emoji is valid\r\n[#if;{$emoji}]\r\n  {=emoji;{catch;\r\n    {emoji.markdown;{$emoji}};\r\n      {return;\r\n        {responder.error;The emoji you input was invalid! Please try again.}\r\n      }\r\n  }}\r\n[/if]\r\n\r\n// Creating the reactrole grp\r\n{=data.{$grp}.defaultmsg;{$msg}}\r\n{=data.{$grp}.defaultemoji;{$emoji}}\r\n{=data.{$grp}.defaultdesc;{$desc}}\r\n{=data.{$grp}.type;{if;{$select};==;True;select;button}}\r\n\r\n// Sending the confirmation to the user\r\n{responder.embed\r\n  title=\"Successfully created a new reaction role group\"\r\n  color=\"{random length=6;ABCDEF1234567890}\"\"\r\n  description=\"<:div_dot:910520099084070923> Group Name: {$grp}\r\n  <:div_dot:910520099084070923> Created At: {time format=F}\r\n  <:div_dot:910520099084070923> Default Emoji: {or;{$emoji};None}\r\n  <:div_dot:910520099084070923> Default Reply Message: {or;{$msg};None}\"}\r\n\r\n// posting a random message for select menu\r\n[#if;{$select};==;true]\r\n  {=ur;{user.roles}}\r\n  {=option;{[]}}\r\n  {=option.0.label;Role Name}\r\n  {=option.0.emoji;{$emoji}}\r\n  {=option.0.value;{$ur.0}}\r\n  {=option.0.description;{$desc}}\r\n  {responder.select\r\n    placeholder=\"This is how your message will look\"\r\n    state=\"testaaaing-select\"\r\n    handler=reactrole\r\n    ;{$option}}\r\n[/if]\r\n\r\n// random message for button\r\n[#if;{$select};==;false]\r\n  {responder.button\r\n    style=secondary\r\n    handler=reactrole\r\n    state=\"testaaaing-button\"\r\n    label=\"Role Name\"\r\n    emoji=\"{$emoji}\"}\r\n[/if]\r\n\r\n// Setting the storage\r\n{store.set;reactroledata;{$data}}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "reactrole add role",
+        "description": "A very cool and useful custom command",
+        "parameters": [
+          {
+            "name": "reactrole_group",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "role",
+            "type": "Role",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "emoji",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "message",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "description",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// Calling all the inputs\r\n{=grp;{option;reactrole_group}}\r\n{=role;{option;role}}\r\n{=emoji;{option;emoji}}\r\n{=msg;{option;message}}\r\n{=desc;{option;description}}\r\n\r\n// Calling the storage\r\n{=data;{store.get;reactroledata}}\r\n\r\n// Retrieving basic data from storage\r\n{=grps;{keys;{$data}}}\r\n\r\n// Checking if the group exists\r\n[#if;{$grps};!includes;{$grp}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The react role group you mentioned doesn't exist! If you would like to create a new reactrole group please run `/reactrole create_group`\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// checking if the role already exists\r\n[#if;{$data.{$grps}.roles};includes;{$role}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The role you input already exists in the group. Please delete the role using `/reactrole view` first!\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the emoji is valid\r\n[#if;{$emoji}]\r\n  {=emoji;{catch;{emoji.markdown;{$emoji}};\r\n      {return;\r\n        {responder.error;The emoji you input was invalid! Please try again.}\r\n      }\r\n  }}\r\n[/if]\r\n\r\n// Making the array for the role\r\n{=arr.emoji;{$emoji}}\r\n{=arr.msg;{$msg}}\r\n{=arr.desc;{$desc}}\r\n{=arr.id;{$role}}\r\n\r\n// Pushing it to the data\r\n{if;{$data.{$grp}.roles};;{=data.{$grp}.roles;{[]}}}\r\n{push;{$data.{$grp}.roles};{$arr}}\r\n\r\n// Sending confirmation to the user\r\n{responder.embed\r\n  color=\"{role.colour;{$role}}\"\r\n  title=\"Successfully added!\"\r\n  description=\"<:div_dot:910520099084070923> Role: {role.mention;{$role}} ({$role})\r\n  <:div_dot:910520099084070923> Role Creation: {role.createdAt;{$role}}\r\n  <:div_dot:910520099084070923> Emoji: {or;{$emoji};None}\r\n  <:div_dot:910520099084070923> Message Reply: {or;{$msg};No Custom Message}\r\n  <:div_dot:910520099084070923> Description: {or;{$desc};None}\"}\r\n\r\n// Setting and saving the storage\r\n{store.set;reactroledata;{$data}}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "reactrole make",
+        "description": "A very cool and useful custom command",
+        "parameters": [
+          {
+            "name": "reactrole_group",
+            "type": "String",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "channel",
+            "type": "Channel",
+            "description": "A very mysterious option",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// Calling all the inputs\r\n{=grp;{option;reactrole_group}}\r\n{=channel;{option;channel}}\r\n\r\n// Calling the storage\r\n{=data;{store.get;reactroledata}}\r\n\r\n// Retrieving basic data from storage\r\n{=grps;{keys;{$data}}}\r\n{=type;{$data.{$grp}.type}}\r\n\r\n// Checking if the group exists\r\n[#if;{$grps};!includes;{$grp}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The react role group you mentioned doesn't exist! If you would like to create a new reactrole group please run `/reactrole create_group`\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Making the select menu data for the react role if the required is select menu\r\n{=stuff;{[]}}\r\n{=desc1;{[]}}\r\n{=info;{$data.{$grp}}}\r\n{=roles;{keys;{$info}}}\r\n\r\n// running check for the select menu if total is more than 3\r\n[#if;{$type};==;select]\r\n{if;{length;{$data.{$grp}.roles}};<;3;\r\n  {return;\r\n    {responder.embed\r\n      description=\"There must be at least 3 roles in the select menu reactrole! Please add more roles using `/reactrole add role`.\"}\r\n    {responder.error}\r\n  }\r\n}\r\n[/if]\r\n\r\n// function to format the placeholders for messages\r\n[#function;format;{=input1};{=role1}]\r\n  {if;{$input1};\r\n  {=one;{$input1}}\r\n  {if;{$role1};\r\n  {if;{$one};\r\n  {=todo;{if;{user.roles};includes;{$role1};removed;added}}\r\n  {=two;{replace;{replace;{$input1};none;h};role_mention;{role.name;{$role1}}}}\r\n  {=three;{replace;{$two};user_mention;{user.mention;{user.id}}}}\r\n  {=four;{replace;{$three};role_id;{role.id;{$role1}}}}\r\n  {=five;{replace;{$four};role_color;{role.colour;{$role1}}}}\r\n  {=six;{replace;{$five};function_todo;{$todo}}}}\r\n  {or;{$six};{$one}}\r\n  }}\r\n[/function]\r\n\r\n// making data for select menu\r\n[#if;{$type};==;select]\r\n[#for;{=info1};{$data.{$grp}.roles}]\r\n  {=valid;{if;{catch;{formatNumber;{$info1.id}}};yes}}\r\n  {if;{$valid};\r\n    {=items.label;{role.name;{$info1.id}}}\r\n    {=items.value;{$info1.id}}\r\n    {=emoji;{or;{$info1.emoji};{$data.{$grp}.defaultemoji}}}\r\n    {if;{$emoji};{if;{emoji.category;{$emoji}};==;guild;\r\n                 {=items.emoji.id;{emoji.id;{$emoji}}}\r\n                 {=items.emoji.name;{emoji.name;{$emoji}}}\r\n                 {=items.emoji.animated;{emoji.animated;{$emoji}}};\r\n                 {=items.emoji.name;{$emoji}}}}\r\n    {=desc;{format;{or;{$info1.desc};{$data.{$grp}.defaultdesc}};{$info1.id}}}\r\n    {if;{$desc};{=items.description;{$desc}}}\r\n    {push;{$stuff};{$items}}\r\n  }\r\n[/for]\r\n\r\n// making the actual select menu\r\n{responder.select minValues=\"1\" maxValues=\"3\" handler=reactrole state=\"select-{$grp}-rr\";{$stuff}}\r\n\r\n// making the embed for the select menu\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234567890}\"\r\n  title=\"Reaction Roles!\"\r\n  description=\"Click on the select menu and select the roles you want! \r\n  You can select upto 3 roles at once.\"}\r\n[/if]\r\n\r\n// Making the function to round up a number\r\n[#function;roundup;{=number}]\r\n  {=num;{catch;{formatNumber;{math;{$number}}};{return;{responder.embed title=\"Error\" description=\"Invalid Number\"}{responder.error}}}} \r\n  {=split;{split;{$num};.}} \r\n  {=numb;{math;{$split.0}+0}} \r\n  {$numb} \r\n[/function]\r\n\r\n// Making the buttons if thats what they want\r\n[#if;{$type};==;button]\r\n{=count;{[]}}\r\n{=desc1;{[]}}\r\n[#for;{=info2};{$data.{$grp}.roles}]\r\n  {=valid;{if;{catch;{formatNumber;{$info2.id}}};yes}}\r\n  {if;{$valid};\r\n      {=emoji;{or;{$info2.emoji};{$data.{$grp}.defaultemoji}}}\r\n      {push;{$count};{math;{pop;{$count}}+1}}\r\n      {=rowindex;{roundup;{math;{math;{$count.0}-1}/5}}}\r\n      {=desc;{format;{or;{$info2.desc};{$data.{$grp}.defaultdesc}};{$info2.id}}}\r\n      {if;{$desc};{push;{$desc1};{or;{$emoji};<:blank:932945888479965205>} {role.mention;{$info2.id}} - {$desc}}}\r\n      {responder.button \r\n        handler=reactrole\r\n        style=secondary\r\n        state=\"button-{$grp}-{$info2.id}-rr\" \r\n        label=\"{role.name;{$info2.id}}\"\r\n        actionRowIndex=\"{$rowindex}\"\r\n        emoji=\"{$emoji}\"};\r\n      {if;{$count.0};>;25;{break}}\r\n  }\r\n[/for]\r\n\r\n// making the embed\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234567890}\"\r\n  title=\"Reaction Roles!\"\r\n  description=\"Click on the respective button to add/remove the role!\r\n\r\n  {join;{$desc1};\\n}\"}\r\n[/if]\r\n\r\n\r\n",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "ComponentCallback",
+        "handlerName": "reactrole",
+        "editOriginal": false,
+        "disableComponent": false
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "{if;{$state};==;;{responder.text;<my text here>}{responder.ephemeral}{responder.send return_id=true}{responder.text;yes}{responder.edit;{message.id}}{responder.send}{return}}\r\n// returning if its a test select menu\r\n{if;{$state};includes;testaaaa;{return;{responder.error;This would contain the output intended!}}}\r\n\r\n// Calling the inputs\r\n{=state1;{split;{$state};-}}\r\n{=len;{length;{$state1}}}\r\n{=role;{if;{$len};==;3;{$values};{[{$state1.2}]}}}\r\n{=grp;{$state1.1}}\r\n\r\n// Calling the storage\r\n{=data;{store.get;reactroledata}}\r\n\r\n// THE DATA FOR EDIT CMD STARTS HERE\r\n[#if;{$state1.0};==;edit]\r\n\r\n// THE DATA FOR VIEWING GROUP\r\n[#if;grprole;includes;{$state1.1}]\r\n{if;{$state1.1};==;grp;{=grp;{$value}}{=roleid;{$data.{$grp}.roles.0.id}};{=grp;{$state1.2}{=roleid;{$value}}}}\r\n{responder.error;Grp: {$grp}\r\nRoleid: {$roleid}}{responder.send}\r\n\r\n// making the select menu for group\r\n{=stuff;{[]}}\r\n[#for;{=grpid};{keys;{$data}}]\r\n   {=e.label;{$grpid}}\r\n   {=e.value;{$grpid}}\r\n   {=e.description;Reactrole Type: {$data.{$grpid}.type}}\r\n   {if;{$grpid};==;{$grp};{=e.default;true}}\r\n   {push;{$stuff};{$e}}\r\n[/for]\r\n\r\n// making select menu for role\r\n{=stuff1;{[]}}\r\n{=roles1;{[]}}\r\n[#for;{=rolei};{$data.{$grp}.roles}]\r\n  {=e.label;{role.name;{$rolei.id}}}\r\n  {=e.value;{$rolei.id}}\r\n  {=e.description;ID: {$rolei.id}}\r\n  {if;{$rolei.id};==;{$roleid};{=e.default;true}}\r\n  {push;{$stuff1};{$e}}\r\n\r\n  {=e1;{math;{length;{$roles1}}+1}) {role.name;{$rolei.id}}}\r\n  {if;{$rolei.id};==;{$roleid};{=e1;**{$e1}**}}\r\n  {push;{$roles1};{$e1}}\r\n[/for]\r\n\r\n{responder.embed\r\n  color=\"{role.color;{$roleid}}\"\r\n  thumbnail=\"{guild.icon}\"\r\n  title=\"Reaction Role List\"\r\n  description=\"<:div_dot:910520099084070923> Group Name: `{$grp}`\r\n  <:div_dot:910520099084070923> Group Type: {$data.{$grp}.type}\r\n  <:div_dot:910520099084070923> Click on the Red Button to delete this role from the reactrole!\"\r\n  footer=\"Please note that deleting any group or role is IRREVERSIBLE and cannot be changed\"}\r\n{responder.embedField\r\n  name=\"Role Info\"\r\n  value=\"<:div_dot:910520099084070923> Role: {role.mention;{$roleid}} | {$roleid}\r\n  <:div_dot:910520099084070923> Emoji: {or;{$data.{$grp}.roles.[id:{$roleid}].emoji};{$data.{$grp}.defaultemoji};None}\r\n  <:div_dot:910520099084070923> Description: {or;{$data.{$grp}.roles.[id:{$roleid}].desc};{$data.{$grp}.defaultdesc};None}\r\n  <:div_dot:910520099084070923> Reply: {or;{$data.{$grp}.roles.[id:{$roleid}].msg};{$data.{$grp}.defaultmsg};None}\"}\r\n{responder.edit;{message.id}}\r\n\r\n// making the edit grp select menu\r\n{responder.select state=\"edit-grp-{$grp}\" handler=reactrole;{$stuff}}\r\n\r\n// making the select role menu\r\n{responder.select state=\"edit-role-{$grp}\" handler=reactrole actionRowIndex=1;{$stuff1}}\r\n\r\n// making embed fr deleting role\r\n  {responder.button\r\n     style=danger\r\n     emoji=⚠️\r\n     label=\"Delete Role\"\r\n     handler=reactrole\r\n     state=\"edit-{$roleid}-{$grp}-delete-role\"\r\n     actionRowIndex=2}\r\n    {responder.button\r\n     style=danger\r\n     emoji=⚠️\r\n     label=\"Delete Group\"\r\n     handler=reactrole\r\n     state=\"edit-{$roleid}-{$grp}-delete-grp\"\r\n     actionRowIndex=2}\r\n[/if]\r\n[/if]\r\n\r\n// THE DATA FOR THE DELETING ROLE STARTS HERE\r\n[#if;{$state};includes;delete]\r\n[#if;{$state1.4};==;grp]\r\n  {=grp11;{$state1.2}}\r\n  {=data.{$grp11};}\r\n  {responder.text;Successfully deleted the reaction role group `{$grp11}`}\r\n  {responder.ephemeral}\r\n\r\n  // SELECT MENU CONTENT STARTS FROM HERE\r\n// making the select menu for group\r\n{=stuff;{[]}}\r\n{=data.{$grp};}\r\n{=grps1;{keys;{$data}}}{=grp;{$grps1.0}}\r\n{responder.error;{$grps1} {$data}}\r\n{responder.send}\r\n{return}\r\n[#for;{=grpid};{$grps}]\r\n   {=e.label;{$grpid}}\r\n   {=e.value;{$grpid}}\r\n   {=e.description;Reactrole Type: {$data.{$grpid}.type}}\r\n   {if;{$grpid};==;{$grp};{=e.default;true}}\r\n   {push;{$stuff};{$e}}\r\n[/for]\r\n\r\n// getting the first role in the group\r\n{=roles;{$data.{$grp}.roles}}\r\n{=roleid;{$roles.0.id}}\r\n\r\n// making select menu for role\r\n{=stuff1;{[]}}\r\n{=roles1;{[]}}\r\n[#for;{=rolei};{$data.{$grp}.roles}]\r\n  {=e.label;{role.name;{$rolei.id}}}\r\n  {=e.value;{$rolei.id}}\r\n  {=e.description;ID: {$rolei.id}}\r\n  {if;{$rolei.id};==;{$roleid};{=e.default;true}}\r\n  {push;{$stuff1};{$e}}\r\n\r\n  {=e1;{math;{length;{$roles1}}+1}) {role.name;{$rolei.id}}}\r\n  {if;{$rolei.id};==;{$roleid};{=e1;**{$e1}**}}\r\n  {push;{$roles1};{$e1}}\r\n[/for]\r\n\r\n// making the embed\r\n{responder.embed\r\n  color=\"{role.color;{$roleid}}\"\r\n  thumbnail=\"{guild.icon}\"\r\n  title=\"Reaction Role List\"\r\n  description=\"<:div_dot:910520099084070923> Group Name: `{$grp}`\r\n  <:div_dot:910520099084070923> Group Type: {$data.{$grp}.type}\r\n  <:div_dot:910520099084070923> Click on the Red Button to delete this role from the reactrole!\"\r\n  footer=\"Please note that deleting any group or role is IRREVERSIBLE and cannot be changed\"}\r\n{responder.embedField\r\n  name=\"Role Info\"\r\n  value=\"<:div_dot:910520099084070923> Role: {role.mention;{$roleid}} | {$roleid}\r\n  <:div_dot:910520099084070923> Emoji: {or;{$data.{$grp}.roles.[id:{$roleid}].emoji};{$data.{$grp}.defaultemoji};None}\r\n  <:div_dot:910520099084070923> Description: {or;{$data.{$grp}.roles.[id:{$roleid}].desc};{$data.{$grp}.defaultdesc};None}\r\n  <:div_dot:910520099084070923> Reply: {or;{$data.{$grp}.roles.[id:{$roleid}].msg};{$data.{$grp}.defaultmsg};None}\"}\r\n\r\n// making the edit grp select menu\r\n{responder.select state=\"edit-grp-{$grp}\" handler=reactrole;{$stuff}}\r\n\r\n// making the select role menu\r\n{responder.select state=\"edit-role-{$grp}\" handler=reactrole actionRowIndex=1;{$stuff1}}\r\n\r\n// making embed fr deleting role\r\n  {responder.button\r\n     style=danger\r\n     emoji=⚠️\r\n     label=\"Delete Role\"\r\n     handler=reactrole\r\n     state=\"edit-{$roleid}-{$grp}-delete-role\"\r\n     actionRowIndex=2}\r\n    {responder.button\r\n     style=danger\r\n     emoji=⚠️\r\n     label=\"Delete Group\"\r\n     handler=reactrole\r\n     state=\"edit-{$roleid}-{$grp}-delete-grp\"\r\n     actionRowIndex=2}\r\n{responder.edit;{message.id}}\r\n[/if]\r\n[/if]\r\n\r\n// THE DATA FOR THE REACTROLE\r\n{=valid?;{if;{$state1.2}{$state1.3};includes;rr;yes;no}}\r\n[#if;{$valid?};==;yes]\r\n\r\n// A random function\r\n[#function;repl;{=input1};{=role1}]\r\n  {if;{$input1};\r\n  {=one;{replace;{$input1};none;}}\r\n  {if;{$role1};\r\n  {if;{$one};\r\n  {=todo;{if;{user.roles};includes;{$role1};removed;added}}\r\n  {=two;{replace;{replace;{$input1};none;h};role_mention;{role.mention;{$role1}}}}\r\n  {=three;{replace;{$two};user_mention;{user.mention;{user.id}}}}\r\n  {=four;{replace;{$three};role_id;{role.id;{$role1}}}}\r\n  {=five;{replace;{$four};role_color;{role.colour;{$role1}}}}\r\n  {=six;{replace;{$five};function_todo;{$todo}}}}\r\n  {or;{$six};{$one}}\r\n  }}\r\n[/function]\r\n\r\n// camelcase\r\n[#function;camelcase;{=input}]\r\n  {=split;{split;{$input};}}\r\n  {=split.0;{casing mode=upper;{$split.0}}}\r\n  {join;{$split};}\r\n[/function]\r\n\r\n// Adding and removing the first role\r\n{=todo;{if;{includes;{user.roles};{$role.0}};remove;add}}\r\n{if;{$todo};==;add;{user.addRole reason=\"Reaction Role\";{$role.0}}}\r\n{if;{$todo};==;remove;{user.removeRole reason=\"Reaction Role\";{$role.0}}}\r\n// Sending Confirmation to the user\r\n{=msg;{or;{repl;{$data.{$grp}.{$role.0}.msg};{$role.0}};{repl;{$data.{$grp}.defaultmsg};{$role.0}};Successfully {$todo}d {role.mention;{$role.0}} to you!}}\r\n{responder.embed\r\n  color={role.colour;{$role.0}}\r\n  title=\"Success!\"\r\n  description=\"{camelcase;{$msg}}\"}\r\n{responder.ephemeral}\r\n\r\n[#if;{$role.1}]\r\n// Adding and removing the second role\r\n{=todo;{if;{includes;{user.roles};{$role.1}};remove;add}}\r\n{if;{$todo};==;add;{user.addRole reason=\"Reaction Role\";{$role.1}}}\r\n{if;{$todo};==;remove;{user.removeRole reason=\"Reaction Role\";{$role.1}}}\r\n// Sending Confirmation to the user\r\n{=msg;{or;{repl;{$data.{$grp}.{$role}.1}.msg};{repl;{$data.{$grp}.defaultmsg}};Successfully {$todo}d {role.mention;{$role.1}} to you!}}\r\n{responder.embed\r\n  color={role.colour;{$role.1}}\r\n  title=\"Success!\"\r\n  description=\"{$msg}\"}\r\n{responder.ephemeral}\r\n[/if]\r\n\r\n[#if;{$role.2}]\r\n// Adding and removing the third role\r\n{=todo;{if;{includes;{user.roles};{$role.2}};remove;add}}\r\n{if;{$todo};==;add;{user.addRole reason=\"Reaction Role\";{$role.1}}}\r\n{if;{$todo};==;remove;{user.removeRole reason=\"Reaction Role\";{$role.1}}}\r\n// Sending Confirmation to the user\r\n{=msg;{or;{repl;{$data.{$grp}.{$role}.1}.msg};{repl;{$data.{$grp}.defaultmsg}};Successfully {$todo}d {role.mention;{$role.1}} to you!}}\r\n{responder.embed\r\n  color={role.colour;{$role.1}}\r\n  title=\"Success!\"\r\n  description=\"{$msg}\"}\r\n{responder.ephemeral}\r\n[/if]\r\n\r\n[/if]",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    }
+  ]
+}
