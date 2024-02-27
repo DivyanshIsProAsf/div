@@ -1,0 +1,288 @@
+{
+  "comment": "Exported from https://atlas.bot",
+  "formatVersion": 2,
+  "exportedAt": "2022-08-20T17:06:19.448Z",
+  "actions": [
+    {
+      "id": "c90484c1-40b0-4f34-a997-6d9fc2a9ef58",
+      "flags": 0,
+      "name": "raffle callback",
+      "trigger": {
+        "handlerName": "raffle",
+        "editOriginal": false,
+        "disableComponent": false,
+        "type": 17,
+        "targetType": null,
+        "name": "my_command",
+        "channelId": null,
+        "afterVerification": null,
+        "roleId": null,
+        "schedule": null,
+        "gracePeriodMinutes": null,
+        "keyword": null,
+        "emoji": null,
+        "description": null,
+        "parameters": [],
+        "voiceChannelId": null,
+        "contextChannelId": null
+      },
+      "disabled": false,
+      "content": "// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.\r\n\r\n// Calling the storage variable and and the state\r\n{=statedata;{$state}}\r\n{=statedata;{split;{$statedata};-}}\r\n{=rafflename;{$statedata.1}}\r\n{=todo;{$statedata.0}}\r\n{=data;{store.get;raffledata}}\r\n\r\n// Checking if the user is the host\r\n{=host;{$data.{$rafflename}.host}}\r\n[#if;{$host};!includes;{user.id}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\" \r\n      description=\"The raffle you are trying to add entries to wasn't started by you! Please try again.\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Getting the entries of the raffle\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=entrykeys;{keys;{$allentries}}}\r\n{=info;\r\n  [#for;{=user};{$entrykeys}]\r\n  <:div_replyblue:910527342806450197> {user.tag;{$user}} - `{$allentries.{$user}}`\r\n  [/for]\r\n}\r\n\r\n// Getting the total entries\r\n{=output;{[]}}\r\n{for;{=user};{$entrykeys};{push;{$output};{$allentries.{$user}}}}\r\n{=output;{join;{$output};+}}\r\n{=total;{math;{$output}}}\r\n\r\n// Getting the data on who has which ticket.\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=ticketCount;{[0]}}\r\n{=ticks;\r\n  [#for;{=user};{$entrykeys}]\r\n    {=number;{$allentries.{$user}}}\r\n    {=tCount;{shift;{$ticketCount}}}\r\n    <:div_dot:910520099084070923> {user.tag;{$user}} - {if;{$number};<=;1;`{math;0{$tCount}+1}`;`{math;{$tCount}+1}` to `{math;{$tCount}+{$number}}`}\r\n    {push;{$ticketCount};{math;{$tCount}+{$number}}}\r\n  [/for]\r\n}\r\n\r\n// Rolling the raffle\r\n{=winnerticket;{randomInt;1;{$total}}}\r\n\r\n// Announcing the winner\r\n[#if;{$todo};==;newwinner]\r\n  {responder.embed\r\n    color=\"{random length=6;ABCDEF1234560}\"\r\n    title=\"Raffle Winner!\"\r\n    description=\"<:div_dot:910520099084070923> The winner for **{$data.{$rafflename}.prize}** raffle has been rerolled!\r\n    <:div_dot:910520099084070923> The new winning ticket is `{$winnerticket}`.\r\n    <:div_dot:910520099084070923> Click on the button to reroll another winner *or* end the raffle and clear the data.\"}\r\n[/if]\r\n\r\n// resetting\r\n[#if;{$todo};==;reset]\r\n{if;{$pin?};==;yes;{message.unpin;{$data.{$rafflename}.log}}}\r\n{=data.{$rafflename};}\r\n{=data;{replace;{$data};\"{$rafflename}\":\"\";}}\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234560}\"\r\n  title=\"Success\"\r\n  description=\"<:div_dot:910520099084070923> The raffle has been successfully reset!\"}\r\n{responder.ephemeral}\r\n{responder.send}\r\n{responder.button \r\n  label=\"Raffle has been ended\"\r\n  url=\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"}\r\n{responder.edit;{message.id}}\r\n[/if]\r\n\r\n\r\n// Setting the new storage variable.\r\n{store.set;raffledata;{$data}}",
+      "cooldownSeconds": 0,
+      "createdAt": "2022-05-27T07:05:19.207Z",
+      "updatedAt": "2022-05-27T07:05:19.207Z",
+      "task": null
+    },
+    {
+      "id": "7e3b2b70-79e2-4939-84d9-2cf295ed8fdf",
+      "flags": 0,
+      "name": "raffle remove",
+      "trigger": {
+        "handlerName": null,
+        "editOriginal": null,
+        "disableComponent": null,
+        "type": 0,
+        "targetType": null,
+        "name": "raffle remove",
+        "channelId": null,
+        "afterVerification": null,
+        "roleId": null,
+        "schedule": null,
+        "gracePeriodMinutes": null,
+        "keyword": null,
+        "emoji": null,
+        "description": "Remove entries from a user in a raffle!",
+        "parameters": [
+          {
+            "name": "raffle_name",
+            "type": 3,
+            "description": "Then name of the raffle.",
+            "required": true
+          },
+          {
+            "name": "user",
+            "type": 6,
+            "description": "The user to remove tickets from",
+            "required": true
+          },
+          {
+            "name": "entries",
+            "type": 10,
+            "description": "The number of tickets to remove.",
+            "required": true
+          }
+        ],
+        "voiceChannelId": null,
+        "contextChannelId": null
+      },
+      "disabled": false,
+      "content": "// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. \r\n// ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.\r\n\r\n// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.\r\n\r\n// Calling all the inputs\r\n{=rafflename;{option;raffle_name}}\r\n{=user;{option;user}}\r\n{=entries;{option;entries}}\r\n\r\n// Calling the storage data\r\n{=data;{store.get;raffledata}}\r\n{=datakeys;{keys;{$data}}}\r\n\r\n// getting the data from the storage variable\r\n{=rafflechan;{$data.rafflechan}}\r\n{=entrychan;{$data.entrychan}}\r\n{=pingrole;{$data.pingrole}}\r\n{=pin?;{$data.pin?}}\r\n{=lock?;{$data.lock?}}\r\n\r\n// Checking if the raffle exists or nah\r\n[#if;{$datakeys};!includes;{$rafflename}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"Looks like the raffle name you entered isn't an existing raffle. Please try again!\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the user is the host\r\n{=host;{$data.{$rafflename}.host}}\r\n[#if;{$host};!includes;{user.id}]\r\n  {return;\r\n    {responder.embed\r\n     title=\"Error\" \r\n     description=\"The raffle you are trying to add entries to wasn't started by you! Please try again.\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the raffle is still valid\r\n{=time;{$data.{$rafflename}.time}}\r\n[#if;{$time};<=;{time}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The raffle name you input has been ended. It ended {time format=R;{$time}}\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Finding user's old entries (if any)\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=userentries;{or;{$allentries.{$user}};0}}\r\n\r\n// checking if the entries are correct or not\r\n[#if;{math;{$userentries}-{$entries}};<;0]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The number of entries you input could not be processed as the said user doesn't have so many entries. Please try again\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Adding user's entries\r\n{=new;{math;{$userentries}-{$entries}}}\r\n{=data.{$rafflename}.entries.{$user};{$new}}\r\n\r\n// Getting the entries of the raffle\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=entrykeys;{keys;{$allentries}}}\r\n{=info;\r\n  [#for;{=user};{$entrykeys}]\r\n  <:div_replyblue:910527342806450197> {user.tag;{$user}} - `{$allentries.{$user}}`\r\n  [/for]\r\n}\r\n\r\n// Sending the embed\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234560}\"\r\n  timestamp=now\r\n  footer_icon=\"{user.avatar}\"\r\n  footer=\"Entries added by {user.tag}\"\r\n  description=\"Tickets have been removed from {user.tag;{$user}}\r\n  <:div_dot:910520099084070923> Number of tickets: `{$entries}`\r\n  <:div_dot:910520099084070923> Total Tickets of {user.mention;{$user}}: `{$new}`\r\n  <:div_dot:910520099084070923> Raffle ends {time format=R;{$time}}\"}\r\n{responder.send}\r\n\r\n// deleting the old info message and sending the new one\r\n{responder.embed;{message.embed;{$entrychan}-{$data.{$rafflename}.info}}}\r\n{responder.channel;{$entrychan}}\r\n{message.delete;{$entrychan}-{$data.{$rafflename}.info}}\r\n\r\n{=msg1;{responder.send return_id=true}}\r\n{=data.{$rafflename}.info;{$msg1}}\r\n\r\n// Setting the new storage data\r\n{store.set;raffledata;{$data}}",
+      "cooldownSeconds": 0,
+      "createdAt": "2022-05-27T07:05:19.206Z",
+      "updatedAt": "2022-05-27T07:05:19.206Z",
+      "task": null
+    },
+    {
+      "id": "5cb8dad7-fb01-45bc-ba68-7a669534973d",
+      "flags": 0,
+      "name": "raffle setup",
+      "trigger": {
+        "handlerName": null,
+        "editOriginal": null,
+        "disableComponent": null,
+        "type": 0,
+        "targetType": null,
+        "name": "raffle setup",
+        "channelId": null,
+        "afterVerification": null,
+        "roleId": null,
+        "schedule": null,
+        "gracePeriodMinutes": null,
+        "keyword": null,
+        "emoji": null,
+        "description": "Start a new raffle in the server!",
+        "parameters": [
+          {
+            "name": "raffle_name",
+            "type": 3,
+            "description": "A very mysterious option",
+            "required": true
+          },
+          {
+            "name": "time",
+            "type": 3,
+            "description": "Name of the raffle.",
+            "required": true
+          },
+          {
+            "name": "prize_coins",
+            "type": 10,
+            "description": "The raffle prize if its coins.",
+            "required": false
+          },
+          {
+            "name": "prize_item_name",
+            "type": 3,
+            "description": "The raffle prize item name if its an item",
+            "required": false
+          },
+          {
+            "name": "prize_item_quantity",
+            "type": 10,
+            "description": "The raffle prize item quantity if its item",
+            "required": false
+          },
+          {
+            "name": "ticket_item_name",
+            "type": 3,
+            "description": "The entry ticket item name",
+            "required": false
+          },
+          {
+            "name": "ticket_item_quantity",
+            "type": 10,
+            "description": "The entry ticket quantity",
+            "required": false
+          },
+          {
+            "name": "ticket_coins",
+            "type": 10,
+            "description": "The entry ticket coins",
+            "required": false
+          }
+        ],
+        "voiceChannelId": null,
+        "contextChannelId": null
+      },
+      "disabled": false,
+      "content": "// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. \n//ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.\n\n// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.\n\n// Calling all the inputs from the options\n{=prizecoins;{option;prize_coins}}\n{=prizeitemquantity;{option;prize_item_quantity}}\n{=prizeitemquantity;{if;{$prizeitemquantity};{$prizeitemquantity};1}}\n{=prizeitemname;{option;prize_item_name}}\n{=ticketitemquantity;{option;ticket_item_quantity}}\n{=ticketitemquantity;{if;{$ticketitemquantity};{$ticketitemquantity};1}}\n{=ticketitemname;{option;ticket_item_name}}\n{=ticketcoins;{option;ticket_coins}}\n{=rafflename;{option;raffle_name}}\n{=time;{option;time}}\n\n// calling the raffle storage data\n{=data;{store.get;raffledata}}\n\n// getting the data from the storage variable\n{=rafflechan;{$data.rafflechan}}\n{=entrychan;{$data.entrychan}}\n{=pingrole;{$data.pingrole}}\n{=pin?;{$data.pin?}}\n{=lock?;{$data.lock?}}\n\n// Running error check on the time\n{=time1;{catch;{time;{$time}};{return;{responder.embed title=Error description=\"Invalid time! Please try again.\"}{responder.error}}}}\n\n// Sending the embed if the ticket type is invalid.\n{=tickettype;{or;{$ticketcoins};{$ticketitemname};{$ticketitemquantity}}}\n{=tickettype2;{if;{$tickettype};{if;{$tickettype};==;{$ticketcoins};ticket_coins;{if;{$tickettype};==;{$ticketitemname};ticket_item;ticket_item_error}};ticket_error_empty}}\n[#if;{$tickettype2};includes;error]\n  {return;\n    {responder.embed\n      title=\"Error\"\n      description=\"The ticket entry fee you input was invalid. Please try again!\"}\n    {responder.error}}\n[/if]\n\n//Sending the embed if the prize type is invalid.\n{=prizetype;{or;{$prizecoins};{$prizeitemname};{$prizeitemquantity}}}\n{=prizetype2;{if;{$prizetype};{if;{$prizetype};==;{$prizecoins};prize_coins;{if;{$prizetype};==;{$prizeitemname};prize_item;prize_item_error}};prize_error_empty}}\n[#if;{$prizetype2};includes;error]\n  {return;\n    {responder.embed\n      title=\"Error 404\"\n      description=\"The prize you input was invalid. Please try again!\"}\n    {responder.error}}\n[/if]\n\n// the type of input and the input\n{=prizetype;{if;{$prizetype};==;{$prizeitemname};`{formatNumber;{$prizeitemquantity}}` {$prizeitemname};`⏣ {formatNumber;{$prizecoins}}`}}\n{=tickettype;{if;{$tickettype};==;{$ticketitemname};`{formatNumber;{$ticketitemquantity}}` {$ticketitemname};`⏣ {formatNumber;{$ticketcoins}}`}}\n\n\n// Starting the raffle\n[#if;{$valid};==;yes]\n{=data.{$rafflename}.host;{user.id}}\n{=data.{$rafflename}.prize;{$prizetype}}\n{=data.{$rafflename}.ticket;{$tickettype}}\n[/if]\n\n// Making the embed which is going to be ephemeral.\n  {responder.embed\n    title=\"Success!\"\n    description=\"The raffle creation was a success!\n    <:tick:935530534950563950> Information and the role mention (if any) has been sent to the said channel.\n    <:tick:935530534950563950> Channel information has been sent to the entry channel.\n    <:tick:935530534950563950> Raffle has been started with the name `{$rafflename}`\"\n    color=\"00FF00\"}\n  {responder.ephemeral}\n  {responder.send}\n\n// Making the embed which is going to be sent in the channel.\n  {responder.text;{role.mention allow_mention;{$pingrole}}}\n  {responder.embed\n    title=\"Raffle Information\"\n    description=\"A new raffle has been created by {user.mention}. \n    <:div_dot:910520099084070923> Raffle ends at <t:{$time1}:F> (<t:{$time1}:R>)\n    <:div_dot:910520099084070923> Winner gets {$prizetype}\n    <:div_dot:910520099084070923> Entry ticket: {$tickettype}\n    <:div_dot:910520099084070923> Host: {user.tag} ({user.mention})\n\n    <:div_dot:910520099084070923> All entries must be sent to **{user.tag}** in {channel.mention;{$entrychan}} only!\"\n    color=\"{random length=6;ABCDEF1234560}\"}\n  {responder.channel;{$rafflechan}}\n\n//Sending the new embed\n{=msg;{responder.send return_id=true}}\n\n// sending info embed in the entry channel\n  {responder.embed\n    title=\"Raffle Information\"\n    description=\"<:div_dot:910520099084070923> Time: <t:{$time1}:F> (<t:{$time1}:R>)\n    <:div_dot:910520099084070923> Prize: {$prizetype}\n    <:div_dot:910520099084070923> Entry: {$tickettype}\n    <:div_dot:910520099084070923> Send your tickets to {user.mention} only.\"\n    color=\"{random length=6;ABCDEF1234560}\"}\n  {responder.channel;{$entrychan}}\n  {=msg1;{responder.send return_id=true}}\n\n// pinning it\n[#if;{$pin?};==;yes]\n  {message.pin;{$rafflechan}-{$msg}}\n[/if]\n\n//Unlocking the entry channel\n[#if;{$lock?};==;yes]\n  {/lock channel=\"{$entrychan}\"}\n[/if]\n\n// Setting the data on the variable\n{=data.{$rafflename}.log;{$msg}}\n{=data.{$rafflename}.info;{$msg1}}\n{=data.{$rafflename}.host;{user.mention}}\n{=data.{$rafflename}.time;{time;{$time}}}\n{=data.{$rafflename}.ticket;{$tickettype}}\n{=data.{$rafflename}.prize;{$prizetype}}\n\n// Setting the variable\n{store.set;raffledata;{$data}}",
+      "cooldownSeconds": 0,
+      "createdAt": "2022-05-27T07:05:19.206Z",
+      "updatedAt": "2022-06-17T10:59:17.423Z",
+      "task": null
+    },
+    {
+      "id": "b63fb958-ffb3-4a7c-acde-5d2faa98bca6",
+      "flags": 0,
+      "name": "raffle add",
+      "trigger": {
+        "handlerName": null,
+        "editOriginal": null,
+        "disableComponent": null,
+        "type": 0,
+        "targetType": null,
+        "name": "raffle add",
+        "channelId": null,
+        "afterVerification": null,
+        "roleId": null,
+        "schedule": null,
+        "gracePeriodMinutes": null,
+        "keyword": null,
+        "emoji": null,
+        "description": "Add entries to a user in a raffle!",
+        "parameters": [
+          {
+            "name": "raffle_name",
+            "type": 3,
+            "description": "The name of the raffle.",
+            "required": true
+          },
+          {
+            "name": "user",
+            "type": 6,
+            "description": "The user to add tickets to.",
+            "required": true
+          },
+          {
+            "name": "entries",
+            "type": 10,
+            "description": "The number of tickets to add.",
+            "required": true
+          }
+        ],
+        "voiceChannelId": null,
+        "contextChannelId": null
+      },
+      "disabled": false,
+      "content": "// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. \r\n// ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.\r\n\r\n// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.\r\n\r\n// Calling all the inputs\r\n{=rafflename;{option;raffle_name}}\r\n{=user;{option;user}}\r\n{=entries;{option;entries}}\r\n\r\n// Calling the storage data\r\n{=data;{store.get;raffledata}}\r\n{=datakeys;{keys;{$data}}}\r\n\r\n// getting the data from the storage variable\r\n{=rafflechan;{$data.rafflechan}}\r\n{=entrychan;{$data.entrychan}}\r\n{=pingrole;{$data.pingrole}}\r\n{=pin?;{$data.pin?}}\r\n{=lock?;{$data.lock?}}\r\n\r\n// Checking if the raffle exists or nah\r\n[#if;{$datakeys};!includes;{$rafflename}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"Looks like the raffle name you entered isn't an existing raffle. Please try again!\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the user is the host\r\n{=host;{$data.{$rafflename}.host}}\r\n[#if;{$host};!includes;{user.id}]\r\n  {return;\r\n    {responder.embed\r\n     title=\"Error\" \r\n     description=\"The raffle you are trying to add entries to wasn't started by you! Please try again.\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the raffle is still valid\r\n{=time;{$data.{$rafflename}.time}}\r\n[#if;{$time};<=;{time}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The raffle name you input has been ended. It ended {time format=R;{$time}}\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Finding user's old entries (if any)\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=userentries;{or;{$allentries.{$user}};0}}\r\n\r\n// Adding user's entries\r\n{=new;{math;{$userentries}+{$entries}}}\r\n{=data.{$rafflename}.entries.{$user};{$new}}\r\n\r\n// Getting the entries of the raffle\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=entrykeys;{keys;{$allentries}}}\r\n{=info;\r\n  [#for;{=user};{$entrykeys}]\r\n  <:div_replyblue:910527342806450197> {user.tag;{$user}} - `{$allentries.{$user}}`\r\n  [/for]\r\n}\r\n\r\n// Sending the embed\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234560}\"\r\n  timestamp=now\r\n  footer_icon=\"{user.avatar}\"\r\n  footer=\"Entries added by {user.tag}\"\r\n  description=\"Tickets have been added to {user.tag;{$user}}\r\n  <:div_dot:910520099084070923> Number of tickets: `{$entries}`\r\n  <:div_dot:910520099084070923> Total Tickets of {user.mention;{$user}}: `{$new}`\r\n  <:div_dot:910520099084070923> Raffle ends {time format=R;{$time}}\"}\r\n{responder.send}\r\n\r\n// deleting the old info message and sending the new one\r\n[#if;{channel.id};==;{$entrychan}]\r\n  {responder.embed;{message.embed;{$entrychan}-{$data.{$rafflename}.info}}}\r\n  {responder.channel;{$entrychan}}\r\n  {message.delete;{$entrychan}-{$data.{$rafflename}.info}}\r\n  {=msg1;{responder.send return_id=true}}\r\n  {=data.{$rafflename}.info;{$msg1}}\r\n[/if]\r\n\r\n// Setting the new storage data\r\n{store.set;raffledata;{$data}}",
+      "cooldownSeconds": 0,
+      "createdAt": "2022-05-27T07:05:19.206Z",
+      "updatedAt": "2022-05-27T07:05:19.206Z",
+      "task": null
+    },
+    {
+      "id": "de2394ea-5a70-41bc-8455-513e4f7f0a96",
+      "flags": 0,
+      "name": "raffle roll",
+      "trigger": {
+        "handlerName": null,
+        "editOriginal": null,
+        "disableComponent": null,
+        "type": 0,
+        "targetType": null,
+        "name": "raffle roll",
+        "channelId": null,
+        "afterVerification": null,
+        "roleId": null,
+        "schedule": null,
+        "gracePeriodMinutes": null,
+        "keyword": null,
+        "emoji": null,
+        "description": "End/roll the winner of a raffle!",
+        "parameters": [
+          {
+            "name": "raffle_name",
+            "type": 3,
+            "description": "The name of the raffle",
+            "required": true
+          }
+        ],
+        "voiceChannelId": null,
+        "contextChannelId": null
+      },
+      "disabled": false,
+      "content": "// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. \r\n//ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.\r\n\r\n// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.\r\n\r\n// Calling all the inputs\r\n{=rafflename;{option;raffle_name}}\r\n\r\n// Calling the storage variable\r\n{=data;{store.get;raffledata}}\r\n\r\n// getting the data from the storage variable\r\n{=rafflechan;{$data.rafflechan}}\r\n{=entrychan;{$data.entrychan}}\r\n{=pingrole;{$data.pingrole}}\r\n{=pin?;{$data.pin?}}\r\n{=lock?;{$data.lock?}}\r\n\r\n// Checking if the raffle exists or nah\r\n{=datakeys;{keys;{$data}}}\r\n[#if;{$datakeys};!includes;{$rafflename}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"Looks like the raffle name you entered isn't an existing raffle. Please try again!\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the user is the host\r\n{=host;{$data.{$rafflename}.host}}\r\n[#if;{$host};!includes;{user.id}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\" \r\n      description=\"The raffle you are trying to add entries to wasn't started by you! Please try again.\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n\r\n// Getting the entries of the raffle\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=entrykeys;{keys;{$allentries}}}\r\n{=info;\r\n  [#for;{=user};{$entrykeys}]\r\n  <:div_replyblue:910527342806450197> {user.tag;{$user}} - `{$allentries.{$user}}`\r\n  [/for]\r\n}\r\n\r\n// Getting the total entries\r\n{=output;{[]}}\r\n{for;{=user};{$entrykeys};{push;{$output};{$allentries.{$user}}}}\r\n{=output;{join;{$output};+}}\r\n{=total;{math;{$output}}}\r\n\r\n// Getting the data on who has which ticket.\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=ticketCount;{[0]}}\r\n{=ticks;\r\n  [#for;{=user};{$entrykeys}]\r\n    {=number;{$allentries.{$user}}}\r\n    {=tCount;{shift;{$ticketCount}}}\r\n    <:div_dot:910520099084070923> {user.tag;{$user}} - {if;{$number};<=;1;`{math;0{$tCount}+1}`;`{math;{$tCount}+1}` to `{math;{$tCount}+{$number}}`}\r\n    {push;{$ticketCount};{math;{$tCount}+{$number}}}\r\n  [/for]\r\n}\r\n\r\n// Rolling the raffle\r\n{=winnerticket;{randomInt;1;{$total}}}\r\n\r\n// Embed for the winner.\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234560}\"\r\n  title=\"Raffle Winner!\"\r\n  description=\"<:div_dot:910520099084070923> The Raffle for **{$data.{$rafflename}.prize}** has been ended!\r\n  <:div_dot:910520099084070923> The winning ticket is `{$winnerticket}`. \r\n  <:div_dot:910520099084070923> The users along with their ticket numbers are displayed below!\"}\r\n\r\n// Embedfield for raffle info\r\n{responder.embedField\r\n  name=\"Raffle Info\"\r\n  value=\"<:div_dot:910520099084070923> Raffle Name: {$rafflename}\r\n  <:div_dot:910520099084070923> Raffle Host: {user.tag;{$data.{$rafflename}.host}}\r\n  <:div_dot:910520099084070923> Prize: {$data.{$rafflename}.prize}\r\n  <:div_dot:910520099084070923> Ticket Cost: {$data.{$rafflename}.ticket}\r\n  <:div_dot:910520099084070923> Total Entries: `{formatNumber;0{$total}}`\"}\r\n\r\n// deleting the info embed\r\n{message.delete;{$entrychan}-{$data.{$rafflename}.info}}\r\n\r\n//embedfield for ticket data\r\n{responder.embedField\r\n  name=\"Tickets List\"\r\n  value=\"{$ticks}\"}\r\n  \r\n// Unlocking the channel.\r\n[#if;{$lock?};==;yes]\r\n{/lock channel={$entrychan}}\r\n[/if]\r\n\r\n// Making the buttons on the message.\r\n{responder.button style=success label=\"New Winner\" handler=raffle state=\"newwinner-{$rafflename}\"}\r\n{responder.button style=danger label=\"Reset Raffle\" handler=raffle state=\"reset-{$rafflename}\"}\r\n",
+      "cooldownSeconds": 0,
+      "createdAt": "2022-05-27T07:05:19.205Z",
+      "updatedAt": "2022-05-27T07:05:19.205Z",
+      "task": null
+    },
+    {
+      "id": "3111e7eb-09f8-49e7-a7b6-2265a7f6cf9a",
+      "flags": 128,
+      "name": "raffle stats",
+      "trigger": {
+        "handlerName": null,
+        "editOriginal": null,
+        "disableComponent": null,
+        "type": 0,
+        "targetType": null,
+        "name": "raffle statistics",
+        "channelId": null,
+        "afterVerification": null,
+        "roleId": null,
+        "schedule": null,
+        "gracePeriodMinutes": null,
+        "keyword": null,
+        "emoji": null,
+        "description": "View the entries and statistics of a raffle.",
+        "parameters": [
+          {
+            "name": "raffle_name",
+            "type": 3,
+            "description": "The name of the raffle",
+            "required": true
+          }
+        ],
+        "voiceChannelId": null,
+        "contextChannelId": null
+      },
+      "disabled": false,
+      "content": "// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. \r\n//ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.\r\n\r\n// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.\r\n\r\n// Calling all the inputs\r\n{=rafflename;{option;raffle_name}}\r\n\r\n// Calling the storage variable\r\n{=data;{store.get;raffledata}}\r\n\r\n// getting the data from the storage variable\r\n{=rafflechan;{$data.rafflechan}}\r\n{=entrychan;{$data.entrychan}}\r\n{=pingrole;{$data.pingrole}}\r\n{=pin?;{$data.pin?}}\r\n{=lock?;{$data.lock?}}\r\n\r\n// Checking if the raffle exists or nah\r\n{=datakeys;{keys;{$data}}}\r\n[#if;{$datakeys};!includes;{$rafflename}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"Looks like the raffle name you entered isn't an existing raffle. Please try again!\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the user is the host\r\n{=host;{$data.{$rafflename}.host}}\r\n[#if;{$host};!includes;{user.id}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\" \r\n      description=\"The raffle you are trying to add entries to wasn't started by you! Please try again.\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Getting the entries of the raffle\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=entrykeys;{keys;{$allentries}}}\r\n{=info;\r\n  [#for;{=user};{$entrykeys}]\r\n  <:div_dot:910520099084070923> {user.tag;{$user}} - `{$allentries.{$user}}`\r\n  [/for]\r\n}\r\n\r\n// Getting the total entries\r\n{=output;{[]}}\r\n{for;{=user};{$entrykeys};{push;{$output};{$allentries.{$user}}}}\r\n{=output;{join;{$output};+}}\r\n{=total;{math;{$output}}}\r\n\r\n// Getting the data on who has which ticket.\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=ticketCount;{[0]}}\r\n{=ticks;\r\n  [#for;{=user};{$entrykeys}]\r\n    {=number;{$allentries.{$user}}}\r\n    {=tCount;{shift;{$ticketCount}}}\r\n    <:div_dot:910520099084070923> {user.tag;{$user}} - {if;{$number};<=;1;`{math;0{$tCount}+1}`;`{math;{$tCount}+1}` to `{math;{$tCount}+{$number}}`}\r\n    {push;{$ticketCount};{math;{$tCount}+{$number}}}\r\n  [/for]\r\n}\r\n\r\n// Making the embed\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234560}\"\r\n  title=\"Raffle Statistics\"\r\n  description=\"<:div_dot:910520099084070923> Raffle Name: {$rafflename}\r\n  <:div_dot:910520099084070923> Raffle Host: {user.tag;{$data.{$rafflename}.host}}\r\n  <:div_dot:910520099084070923> Prize: {$data.{$rafflename}.prize}\r\n  <:div_dot:910520099084070923> Ticket Cost: {$data.{$rafflename}.ticket}\r\n  <:div_dot:910520099084070923> Total Entries: `{formatNumber;0{$total}}`\"}\r\n{responder.embedField\r\n  name=\"Raffle List\"\r\n  value=\"{$info}\"}\r\n{responder.embedField\r\n  name=\"Tickets Number\"\r\n  value=\"{$ticks}\"}\r\n",
+      "cooldownSeconds": 0,
+      "createdAt": "2022-05-27T07:05:19.204Z",
+      "updatedAt": "2022-05-27T07:05:19.204Z",
+      "task": null
+    }
+  ]
+}
