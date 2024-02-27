@@ -1,0 +1,167 @@
+{
+  "comment": "Exported from https://atlas.bot",
+  "formatVersion": 2,
+  "exportedAt": "2024-02-12T04:29:03.011Z",
+  "actions": [
+    {
+      "trigger": {
+        "type": "Keyword",
+        "keyword": "!rlog"
+      },
+      "disabled": false,
+      "name": "My Action",
+      "content": "// checking if the input is correct and if the correct message has been referred to\r\n{=input;{message.content}}\r\n{=split;{split;{$input}; }}\r\n\r\n{if;{$split.0};!==;!rlog;{return;{message.addReaction;❎;{message.id}}{sleep;5}{message.delete;{message.id}}}}\r\n{if;{length;{$split}};!==;2;{return;{message.addReaction;❎;{message.id}}{sleep;5}{message.delete;{message.id}}}}\r\n\r\n// checking if reply is correct\r\n{=replyid;{catch;{message.referenceId;{message.id}};{return;{message.addReaction;❎;{message.id}}{sleep;5}{message.delete;{message.id}}}}}\r\n{=embed;{catch;{message.embed;{$replyid}};{return;{message.addReaction;❎;{message.id}}{sleep;5}{message.delete;{message.id}}}}}\r\n{=amount;{find;{replace;{$embed.description};,;};/\\d+/}}\r\n\r\n// getting storage\r\n{=user;{user.id;{$split.1}}}\r\n{=data;{or;{store.get;lottodata};{{}}}}\r\n\r\n// getting user prev entries\r\n{=old;{$data.entries.{$user}}}\r\n\r\n// getting total entries\r\n{=userentries;{math;floor({$amount}/500000)}}\r\n{=new;{math;{$old}+{$userentries}}}\r\n{=new;{if;{$new};>;50;50;{$new}}}\r\n{=data.entries.{$user};{$new}}\r\n\r\n// bonus\r\n{=bonuse;{if;{user.roles;{$user}};contains;894920045958946858;5;{if;{user.roles;{$user}};contains;1081304154338758737;5}}}\r\n{=data.bonus.{$user};{$bonuse}}\r\n\r\n{store.set;lottodata;{$data}}\r\n{message.addReaction;:TA_tick:;{message.id}}\r\n{message.addReaction;:TA_tick:;{$replyid}}\r\n\r\n{responder.text;Added `{if;{$userentries};<;50;{$userentries};50}` tickets to {user.mention;{$user}}{if;{$bonuse};(+{$bonuse} bonus)}}\r\n{responder.channel;1106556150356381756}\r\n{responder.send}\r\n{sleep;5}\r\n{message.delete;{message.id}}\r\n",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": {
+        "permissions": "8",
+        "roleMode": "Blacklist",
+        "roleValue": [],
+        "channelMode": "Whitelist",
+        "channelValue": [
+          "1106556230727630910"
+        ]
+      },
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "lottery start",
+        "description": "Start a lottery!",
+        "parameters": []
+      },
+      "disabled": false,
+      "name": "My Action",
+      "content": "// Setting up the storage\r\n{store.delete;lottodata}\r\n{=data;{or;{store.get;lottodata};{{}}}}\r\n\r\n{responder.text;Lottery Started!}\r\n{responder.ephemeral}\r\n{responder.send}\r\n// Making the embed\r\n{responder.text;{role.mention allow_mention=true;894903991698329600} {role.mention allow_mention=true;916251864759169044}}\r\n{responder.embed \r\ntitle=\"The Arcade Lottery <:winninglotteryticket:1165721931690016860>\"\r\ndescription=\"<:div_dot:910520099084070923> Each ticket costs **⏣ 500,000** and each user can buy a maximum of **50 tickets (⏣ 25M)**\r\n<:div_dot:910520099084070923> Prize Pool: **85% of all the entries!** <a:freemoney:745779611669102724> \r\n<:div_dot:910520099084070923> Lottery ends **{time format=R;7 days}** <a:TA_itstime:984733232736137236>\r\n<:div_dot:910520099084070923> Bonus Entries: {role.mention allow_mention=false;1135661072775393381} and {role.mention allow_mention=false;894920045958946858} get **5** additional entries! \r\n<:div_dot:910520099084070923> Boost us or join the grinder team (<#996062772074913802>)\"}\r\n{responder.send ignore_interaction=true}\r\n\r\n{/lock channel=1106556230727630910}\r\n{channel.edit ratelimit=5m;1106556230727630910}\r\n{responder.text;The channel has been successfully unlocked!}\r\n{responder.text;Lottery has been started! You can send your entries in this channel!!}\r\n{responder.channel;1106556230727630910}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "lottery end",
+        "description": "End an ongoing lottery!",
+        "parameters": []
+      },
+      "disabled": false,
+      "name": "rend",
+      "content": "{=data;{store.get;lottodata}}\r\n{=entries;{keys;{$data.entries}}}\r\n{=e;{{}}}\r\n{=e;{$data}}\r\n[#for;{=userid};{$entries}]\r\n  {=tickets;{$data.entries.{$userid}}}\r\n  {if;{$tickets};==;55;{=e.entries.{$userid};50}{=e.bonus.{$userid};5}}\r\n[/for]\r\n{=data;{$e}}\r\n\r\n// Getting the entries of the raffle\r\n{=allentries;{$data.entries}}\r\n{=entrykeys;{keys;{$allentries}}}\r\n\r\n// getting everything\r\n{=entriestotal;{[]}}\r\n{=bonus;{[]}}\r\n{=embed;{[]}}\r\n{=ticketCount;{[0]}}\r\n{=obj;{{}}}\r\n\r\n[#for;{=user};{$entrykeys}]\r\n  {=uentry;{$data.entries.{$user}}}\r\n  {=ubonus;{$data.bonus.{$user}}}\r\n  {push;{$entriestotal};0{$uentry}}\r\n  {push;{$bonus};0{$ubonus}}\r\n  {=number;{math;0{$uentry}+0{$ubonus}}}\r\n  {=number;{if;{$number};>;55;55;{$number}}}\r\n  {=tCount;{shift;{$ticketCount}}}\r\n  {=obj.{$user};{if;{$number};<=;1;{math;0{$tCount}+1};{math;{$tCount}+{$number}}}}\r\n  {push;{$ticketCount};{math;{$tCount}+{$number}}}\r\n[/for]\r\n\r\n{=total;{math;{join;{$entriestotal};+}}}\r\n{=bonus;{math;{join;{$bonus};+}}}\r\n\r\n// Rolling the raffle\r\n{=winnerticket;{randomInt;1;{$total}}}\r\n\r\n// the function for the winning ticket\r\n[#function;nextNum;{=number};{=array}]\r\n   {=winningNum;{$number}}\r\n   {=arr; {join;{$array};  } }\r\n   {=temp;{split;{$winningNum};}}\r\n   {=first;{shift;{$temp}}}\r\n   {=regexTemp;{random length={length;{$temp}};{[\\d]}}}\r\n   {=regex;[^\\d]({$first}{if;{$temp.0};[{join;{$temp};-9][}-9]|{$first}[{math;{$temp.0}+1}-9]{random length={math;{length;{$temp}}-1};{[\\d]}}}|{if;{$first};!=;9;[{math;{$first}+1}-9]{$regexTemp}|}\\d?\\d?\\d\\d{$regexTemp})[^\\d]}\r\n   {=list;{sort;{find return_all;{$arr};/{$regex}/g;1}}}\r\n   {return;{$list.0}}\r\n[/function]\r\n{=winner;{find;{$obj};/\"(\\d\\{16,\\})\":\\s?\"?{nextNum;{$winnerticket};{find return_all;{$obj};/:\\s?\"?(\\d+)/g;1}}/;1}}\r\n\r\n// finding the total prize to the winner\r\n{=jackpot;{math;{$total}*500000*0.85}}\r\n\r\n// Embed for the winner.\r\n// {responder.text;{role.mention allow_mention;{$pingrole}} | {user.mention allow_mention;{$winner}}}\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234560}\"\r\n  title=\"Lottery Winner!\"\r\n  description=\"<:div_dot:910520099084070923> The weekly lottery has ended!!\r\n  <:div_dot:910520099084070923> **The winner of the lottery is {user.mention;{$winner}}**\r\n  <:div_dot:910520099084070923> The winning ticket is `{$winnerticket}`.\r\n  <:div_dot:910520099084070923> No. of tickets bought by winner: `{$data.{$rafflename}.entries.{$winner}}`}\r\n{responder.button disabled=true state=1 style=success handler=lol label=\"Prize: ⏣ {formatNumber;{$jackpot}}\"}\r\n{responder.button disabled=true state=2 style=danger handler=lol label=\"Total Entries: {formatNumber;{$total}}\"}\r\n{responder.channel;1106556196527288350}\r\n{responder.send}\r\n\r\n// locking the channel\r\n{/lock;1106556230727630910}\r\n\r\n// DMing the winner\r\n{responder.embed \r\n  title=\"Congratulations!\"\r\n  description=\"Congratulations **{user.username;{$winner}}** on winning the weekly lottery in **{guild.name}**\r\n  You have won the jackpot of `⏣ {formatNumber;{$jackpot}}`!\"\r\n  color=\"{random length=6;ABCDEF1234567890}\"}\r\n{responder.dm;{$winner}}\r\n{responder.send}\r\n\r\n// DMing the host\r\n{responder.embed\r\n title=\"The weekly raffle has ended\"\r\n  description=\"The weekly lottery has ended and the winner is {user.mention;{$winner}}\r\n  They won the jackpot of `⏣ {formatNumber;{$jackpot}}`\"}\r\n{responder.dm;{user.id}}\r\n{responder.send}\r\n\r\n{responder.text;hello}\r\n{responder.ephemeral}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": {
+        "permissions": "0",
+        "roleMode": "Whitelist",
+        "roleValue": [
+          "968776453611225159"
+        ],
+        "channelMode": "Blacklist",
+        "channelValue": []
+      },
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "lottery add",
+        "description": null,
+        "parameters": [
+          {
+            "name": "user",
+            "type": "User",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "entries",
+            "type": "Number",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": false,
+      "name": "My Action",
+      "content": "// getting storage\r\n{=user;{user.id;{?user}}}\r\n{=data;{or;{store.get;lottodata};{{}}}}\r\n\r\n// getting user prev entries\r\n{=old;{$data.entries.{$user}}}\r\n\r\n// getting total entries\r\n{=userentries;{?entries}}\r\n{=new;{math;{$old}+{$userentries}}}\r\n{=new;{if;{$new};>;50;50;{$new}}}\r\n{=data.entries.{$user};{$new}}\r\n\r\n// Sending the embed\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234560}\"\r\n  timestamp=now\r\n  footer_icon=\"{user.avatar}\"\r\n  footer=\"Entries added by {user.tag}\"\r\n  description=\"Tickets have been added to {user.tag;{$user}}\r\n  <:div_dot:910520099084070923> Number of tickets: `{$entries}`\r\n  <:div_dot:910520099084070923> Total Tickets of {user.mention;{$user}}: `{$new}`\"}\r\n{=mid;{responder.send return_id=true}}\r\n// sending the log embed\r\n{responder.text;Added `{if;{$userentries};<;50;{$userentries};50}` tickets to {user.mention;{$user}}{if;{$bonuse};(+{$bonuse} bonus)}}\r\n{responder.channel;1106556150356381756}\r\n{responder.send}\r\n\r\n// Setting the new storage data\r\n{store.set;lottodata;{$data}}\r\n{sleep;10}\r\n",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": {
+        "permissions": "8",
+        "roleMode": "Blacklist",
+        "roleValue": [],
+        "channelMode": "Blacklist",
+        "channelValue": []
+      },
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "lottery info",
+        "description": "Check the current lottery's statistics!",
+        "parameters": []
+      },
+      "disabled": false,
+      "name": "My Action",
+      "content": "{=data;{store.get;lottodata}}\r\n\r\n// Getting the entries of the raffle\r\n{=allentries;{$data.entries}}\r\n{=entrykeys;{keys;{$allentries}}}\r\n\r\n// getting everything\r\n{=entriestotal;{[]}}\r\n{=bonus;{[]}}\r\n{=embed;{[]}}\r\n{=ticketCount;{[0]}}\r\n{=obj;{{}}}\r\n\r\n[#for;{=user};{$entrykeys}]\r\n  {=uentry;{$data.entries.{$user}}}\r\n  {=ubonus;{$data.bonus.{$user}}}\r\n  {push;{$entriestotal};0{$uentry}}\r\n  {push;{$bonus};0{$ubonus}}\r\n  {=number;{math;0{$uentry}+0{$ubonus}}}\r\n  {=number;{if;{$number};>;55;55;{$number}}}\r\n  {=tCount;{shift;{$ticketCount}}}\r\n  {=obj.{$user};{if;{$number};<=;1;{math;0{$tCount}+1};{math;{$tCount}+{$number}}}}\r\n  {push;{$ticketCount};{math;{$tCount}+{$number}}}\r\n[/for]\r\n\r\n{=total;{math;{join;{$entriestotal};+}}}\r\n{=bonus;{math;{join;{$bonus};+}}}\r\n\r\n// Rolling the raffle\r\n{=winnerticket;{randomInt;1;{$total}}}\r\n\r\n// the function for the winning ticket\r\n[#function;nextNum;{=number};{=array}]\r\n   {=winningNum;{$number}}\r\n   {=arr; {join;{$array};  } }\r\n   {=temp;{split;{$winningNum};}}\r\n   {=first;{shift;{$temp}}}\r\n   {=regexTemp;{random length={length;{$temp}};{[\\d]}}}\r\n   {=regex;[^\\d]({$first}{if;{$temp.0};[{join;{$temp};-9][}-9]|{$first}[{math;{$temp.0}+1}-9]{random length={math;{length;{$temp}}-1};{[\\d]}}}|{if;{$first};!=;9;[{math;{$first}+1}-9]{$regexTemp}|}\\d?\\d?\\d\\d{$regexTemp})[^\\d]}\r\n   {=list;{sort;{find return_all;{$arr};/{$regex}/g;1}}}\r\n   {return;{$list.0}}\r\n[/function]\r\n{=winner;{find;{$obj};/\"(\\d\\{16,\\})\":\\s?\"?{nextNum;{$winnerticket};{find return_all;{$obj};/:\\s?\"?(\\d+)/g;1}}/;1}}\r\n\r\n// finding the total prize to the winner\r\n{=jackpot;{math;{$total}*500000*0.85}}\r\n\r\n{responder.embed\r\n description=\"<:div_dot:910520099084070923> Total Entries: `{math;{$total}+0{$bonus}}`\r\n <:div_dot:910520099084070923> Bonus Entries: `{$bonus}`\r\n <:div_dot:910520099084070923> Total Entries Value: `⏣ {formatNumber;{math;{$total}*500000}}`\r\n <:div_dot:910520099084070923> Prize Pool for Winner: `⏣ {formatNumber;{$jackpot}}`\"\r\n title=\"Lottery Information\"\r\n color={random length=6;ABCDEF1234567890}\r\n}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "lotto remove",
+        "description": "A very cool and useful custom command",
+        "parameters": [
+          {
+            "name": "user",
+            "type": "User",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "entries",
+            "type": "Number",
+            "description": "A very mysterious option",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": false,
+      "name": "My Action",
+      "content": "// MAKE SURE TO SET THE RESTRICTION ON WHO CAN USE THIS CMD BY GOING TO THE SETTINGS OPTION IN THIS ACTION AND ALL THE OTHER RAFFLE ACTIONS AS WELL. \r\n// ALTERNATIVELY, YOU CAN SET THE RESTRICTION IN DISCORD ITSELF BY GOING TO Server Settings -> Integrations -> Atlas -> /raffle . Then put your restriction there.\r\n\r\n// DO NOT EDIT ANYTHING BELLOW HERE UNLESS YOU KNOW WHAT TO DO.\r\n\r\n// Calling all the inputs\r\n{=rafflename;weeklyraffle}\r\n{=user;{option;user}}\r\n{=entries;{option;entries}}\r\n\r\n// Calling the storage data\r\n{=data;{store.get;raffledata}}\r\n{=datakeys;{keys;{$data}}}\r\n\r\n// getting the data from the storage variable\r\n{=rafflechan;{$data.rafflechan}}\r\n{=entrychan;{$data.entrychan}}\r\n{=pingrole;{$data.pingrole}}\r\n{=pin?;{$data.pin?}}\r\n{=lock?;{$data.lock?}}\r\n\r\n// Checking if the raffle exists or nah\r\n[#if;{$datakeys};!includes;{$rafflename}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"Looks like the raffle name you entered isn't an existing raffle. Please try again!\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the user is the host\r\n{=host;{$data.{$rafflename}.host}}\r\n[#if;{user.hasPermission;ADMINISTRATOR;{user.id}};==;false]\r\n  {return;\r\n    {responder.embed\r\n     title=\"Error\" \r\n     description=\"The raffle you are trying to add entries to wasn't started by you! Please try again.\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Checking if the raffle is still valid\r\n{=time;{$data.{$rafflename}.time}}\r\n[#if;{$time};<=;{time}]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The raffle name you input has been ended. It ended {time format=R;{$time}}\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Finding user's old entries (if any)\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=userentries;{or;{$allentries.{$user}};0}}\r\n\r\n// checking if the entries are correct or not\r\n[#if;{math;{$userentries}-{$entries}};<;0]\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"The number of entries you input could not be processed as the said user doesn't have so many entries. Please try again\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Adding user's entries\r\n{=new;{math;{$userentries}-{$entries}}}\r\n{=data.{$rafflename}.entries.{$user};{$new}}\r\n\r\n// Getting the entries of the raffle\r\n{=allentries;{$data.{$rafflename}.entries}}\r\n{=entrykeys;{keys;{$allentries}}}\r\n{=info;\r\n  [#for;{=user1};{$entrykeys}]\r\n  <:div_replyblue:910527342806450197> {user.tag;{$user1}} - `{$allentries.{$user1}}`\r\n  [/for]\r\n}\r\n\r\n// Sending the embed\r\n{responder.embed\r\n  color=\"{random length=6;ABCDEF1234560}\"\r\n  timestamp=now\r\n  footer_icon=\"{user.avatar}\"\r\n  footer=\"Entries added by {user.tag}\"\r\n  description=\"Tickets have been removed from {user.tag;{$user}}\r\n  <:div_dot:910520099084070923> Number of tickets: `{$entries}`\r\n  <:div_dot:910520099084070923> Total Tickets of {user.mention;{$user}}: `{$new}`\r\n  <:div_dot:910520099084070923> Raffle ends {time format=R;{$time}}\"}\r\n{responder.send}\r\n\r\n// deleting the old info message and sending the new one\r\n{responder.embed;{message.embed;{$entrychan}-{$data.{$rafflename}.info}}}\r\n{responder.channel;{$entrychan}}\r\n{message.delete;{$entrychan}-{$data.{$rafflename}.info}}\r\n\r\n{=msg1;{responder.send return_id=true}}\r\n{=data.{$rafflename}.info;{$msg1}}\r\n\r\n// Setting the new storage data\r\n{store.set;raffledata;{$data}}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    }
+  ]
+}
