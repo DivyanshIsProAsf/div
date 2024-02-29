@@ -1,0 +1,183 @@
+{
+  "comment": "Exported from https://atlas.bot",
+  "formatVersion": 2,
+  "exportedAt": "2024-02-29T08:26:13.529Z",
+  "actions": [
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "suggestion consider",
+        "description": "Mark a suggestion as considered!",
+        "parameters": [
+          {
+            "name": "suggestion_id",
+            "type": "Number",
+            "description": "The suggestion ID",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "message",
+            "type": "String",
+            "description": "Message for the action performed",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// Change all these stuff below based on the stuff\r\n// MAKE SURE TO SETUP THE ROLES EITHER IN NATIVE DISCORD OR THROUGH ATLAS RESTRICTIONS! OTHERWISE EVERYONE WILL BE ABLE TO ACCEPT/DENY SUGGESTIONS!!\r\n// Inputchan is the channel where the cmd is going to work successfully. People will only be able to suggest in that channel.\r\n{=inputchan;{store.get;div}}\r\n// Suggestionchan is the channel where all new suggestions are sent.\r\n{=suggestionchan;{$inputchan}}\r\n// The role to ping.\r\n{=role;}\r\n// Whether to make the suggestions anonymous (true/false)\r\n{=anonymous;false}\r\n\r\n// Calling the inputs\r\n{=id;{option;suggestion_id}}\r\n{=feedback;{option;message}}\r\n\r\n// Calling the storage variable\r\n{=data;{store.get;suggestiondata}}\r\n{=sender;{$data.{$id}.sender}}\r\n\r\n// Running the check for valid suggestionid\r\n{=len;{$data.count}}\r\n[#if;{$id};>;{$len}]\r\n  {return;\r\n    {responder.embed\r\n      description=\"Invalid suggestion id! Please try again\"\r\n      title=\"Error\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Getting the data for the suggestion\r\n{=msgid;{$data.poll-{$id}.msgid}}\r\n{=embed;{message.embed;{channel.id}-{$msgid}}}\r\n{=suggestion;{$embed.description}}\r\n{=footer;{$embed.footer.text}}\r\n// Function to round off\r\n[#function;round;{=number}]\r\n  {=num;{catch;{formatNumber;{math;{$number}}};{return;{responder.embed title=\"Error\" description=\"Invalid Number\"}{responder.error}}}} \r\n  {=split;{split;{$num};.}} \r\n  {=add;{if;{$split.1};>=;5;1;0}} \r\n  {=numb;{math;{$split.0}+{$add}}} \r\n  {$numb} \r\n[/function] \r\n\r\n// Finding upvotes and downvotes\r\n{=upvote;{$data.poll-{$id}.upvote}}\r\n{=downvote;{$data.poll-{$id}.downvote}}\r\n{=total;{math;0{$upvote}+0{$downvote}}}\r\n{=total;{or;{$total};1}}\r\n{=upvotepercent;{round;{math;{$upvote}*100/{$total}}}}\r\n{=downvotepercent;{round;{math;{$downvote}*100/{$total}}}}\r\n\r\n// Changing suggestion's status to accepted\r\n{=data.poll-{$id}.status;considered}\r\n\r\n// Making embed for the new message in the suggestion channel\r\n{=embed.footer.text;Suggestion #{$id} considered}\r\n{=embed.fields;}\r\n{responder.embed color=\"FDFF91\";{$embed}}\r\n{responder.embedField\r\n  name=\"Reason from {user.tag}\"\r\n  value=\"{or;{$feedback};No reason}\"}\r\n{responder.button style=secondary handler=yes disabled=true label=\"Status: Considered\"}\r\n{responder.edit;{$msgid}}\r\n{responder.send}\r\n\r\n// Function for progress bar\r\n[#function;progressbar;{=num}]\r\n  {=bar1;{if;{$num};<;5;<:bar1empty:1016590808721412126>;{if;{$num};<;10;<a:bar1half:1016590517074661416>;{if;{$num};<;15;<a:bar1mid:1017011517847248907>;<a:bar1full:1016588733757272084>}}}}\r\n  {=bar2;{if;{$num};<;25;<:bar2empty:1016590601766064149>;{if;{$num};<;30;<a:bar2mid:1016589356070346812>;{if;{$num};<;35;<a:bar2mid:1016589356070346812>;<a:bar2full:1016589195923443752>}}}}\r\n  {=bar3;{if;{$num};<;45;<:bar2empty:1016590601766064149>;{if;{$num};<;50;<a:bar2mid:1016589356070346812>;{if;{$num};<;55;<a:bar2mid:1016589356070346812>;<a:bar2full:1016589195923443752>}}}}\r\n  {=bar4;{if;{$num};<;65;<:bar2empty:1016590601766064149>;{if;{$num};<;70;<a:bar2mid:1016589356070346812>;{if;{$num};<;75;<a:bar2mid:1016589356070346812>;<a:bar2full:1016589195923443752>}}}}\r\n  {=bar5;{if;{$num};<;85;<:bar3empty:1016589721020928011>;{if;{$num};<;90;<a:bar3mid:1016589842357948568>;{if;{$num};<;95;<a:bar3mid:1016589842357948568>;<a:bar3full:1016590263176675328>}}}}\r\n  {$bar1}{$bar2}{$bar3}{$bar4}{$bar5}\r\n[/function]\r\n\r\n// Making the embed to be dmed to the sender\r\n{responder.embed\r\n  author-image=\"{user.avatar;{$sender}}\"\r\n  author-name=\"Suggestion #{$id}\"\r\n  color=\"FDFF91\"\r\n  title=\"Suggestion Considered!\"\r\n  description=\"Your suggestion in **{server.name}** has been marked as considered by {user.mention} {if;{$feedback};with the following reason\r\n  > {$feedback}}\r\n  Thank you for contributing to the server and making a change in it!\"}\r\n{responder.embedField\r\n  name=\"Suggestion Content\"\r\n  value=\">>> {$suggestion}\"}\r\n{responder.embedField\r\n  name=\"Statistics\"\r\n  value=\"<:PepeYes:744104906532585522> **Upvotes**\r\n  <:replycont:906069715884081152> `{$upvote}` people upvoted your post!\r\n  <:reply:906069685110460446> {progressbar;{$upvotepercent}} `{$upvotepercent}%`\r\n  \r\n  <:pepeno:906049948565504011> **Downvotes**\r\n  <:replycont:906069715884081152> `{$downvote}` people downvoted your post!\r\n  <:reply:906069685110460446> {progressbar;{$downvotepercent}} `{$downvotepercent}%`\"}\r\n{responder.dm;{$sender}}\r\n{responder.send}\r\n\r\n// Message to be sent out to the user\r\n{responder.error;Successfully marked suggestion #{$id} as considered!}\r\n\r\n// Setting the storage\r\n{store.set;suggestiondata;{$data}}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "suggestion who",
+        "description": "A very cool and useful custom command",
+        "parameters": [
+          {
+            "name": "suggestion_id",
+            "type": "Number",
+            "description": "The suggestion ID",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// Change all these stuff below based on the stuff\r\n// MAKE SURE TO SETUP THE ROLES EITHER IN NATIVE DISCORD OR THROUGH ATLAS RESTRICTIONS! OTHERWISE EVERYONE WILL BE ABLE TO ACCEPT/DENY SUGGESTIONS!!\r\n// Inputchan is the channel where the cmd is going to work successfully. People will only be able to suggest in that channel.\r\n{=inputchan;{store.get;div}}\r\n// Suggestionchan is the channel where all new suggestions are sent.\r\n{=suggestionchan;{$inputchan}}\r\n// The role to ping.\r\n{=role;}\r\n// Whether to make the suggestions anonymous (true/false)\r\n{=anonymous;false}\r\n\r\n// Calling the inputs\r\n{=id;{option;suggestion_id}}\r\n{=feedback;{option;message}}\r\n\r\n// Calling the storage variable\r\n{=data;{store.get;suggestiondata}}\r\n\r\n// Running the check for valid suggestionid\r\n{=len;{$data.count}}\r\n[#if;{$id};>;{$len}]\r\n  {return;\r\n    {responder.embed\r\n      description=\"Invalid suggestion id! Please try again\"\r\n      title=\"Error\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Retrieving the suggestion data\r\n{=info;{$data.poll-{$id}}}\r\n{=sender;{$info.sender}}\r\n{=msgid;{$info.msgid}}\r\n{=upvote;{$info.upvote}}\r\n{=downvote;{$info.downvote}}\r\n{=status;{or;{$info.status};Under Review}}\r\n\r\n// Making the embed\r\n{responder.embed\r\n  title=\"Suggestion #{$id} Information\"\r\n  color=\"{random length=6;ABCDEF1234567890}\"\r\n  description=\"<:div_dot:910520099084070923> Suggestion ID: `{$id}`\r\n  <:div_dot:910520099084070923> Original Poster: {user.tag;{$sender}} ({user.id;{$sender}})\r\n  <:div_dot:910520099084070923> Message Link: [Click Me]({message.link;{$suggestionchan}-{$msgid}})\r\n  <:div_dot:910520099084070923> Upvotes: `{$upvote}`\r\n  <:div_dot:910520099084070923> Downvotes: `{$downvote}`\r\n  <:div_dot:910520099084070923> Time of Creation: {time format=F;{message.createdAt;{$suggestionchan}-{$msgid}}}\r\n  <:div_dot:910520099084070923> Suggestion Status: **{$status}**\"\r\n  thumbnail=\"{user.avatar;{$sender}}\"}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "suggestion deny",
+        "description": "A very cool and useful custom command",
+        "parameters": [
+          {
+            "name": "suggestion_id",
+            "type": "Number",
+            "description": "The suggestion ID",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "message",
+            "type": "String",
+            "description": "Message for the action performed",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// Change all these stuff below based on the stuff\r\n// MAKE SURE TO SETUP THE ROLES EITHER IN NATIVE DISCORD OR THROUGH ATLAS RESTRICTIONS! OTHERWISE EVERYONE WILL BE ABLE TO ACCEPT/DENY SUGGESTIONS!!\r\n// Inputchan is the channel where the cmd is going to work successfully. People will only be able to suggest in that channel.\r\n{=inputchan;{store.get;div}}\r\n// Suggestionchan is the channel where all new suggestions are sent.\r\n{=suggestionchan;{$inputchan}}\r\n// The role to ping.\r\n{=role;}\r\n// Whether to make the suggestions anonymous (true/false)\r\n{=anonymous;false}\r\n\r\n// Calling the inputs\r\n{=id;{option;suggestion_id}}\r\n{=feedback;{option;message}}\r\n\r\n// Calling the storage variable\r\n{=data;{store.get;suggestiondata}}\r\n{=sender;{$data.{$id}.sender}}\r\n\r\n// Running the check for valid suggestionid\r\n{=len;{$data.count}}\r\n[#if;{$id};>;{$len}]\r\n  {return;\r\n    {responder.embed\r\n      description=\"Invalid suggestion id! Please try again\"\r\n      title=\"Error\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Getting the data for the suggestion\r\n{=msgid;{$data.poll-{$id}.msgid}}\r\n{=embed;{message.embed;{channel.id}-{$msgid}}}\r\n{=suggestion;{$embed.description}}\r\n{=footer;{$embed.footer.text}}\r\n// Function to round off\r\n[#function;round;{=number}]\r\n  {=num;{catch;{formatNumber;{math;{$number}}};{return;{responder.embed title=\"Error\" description=\"Invalid Number\"}{responder.error}}}} \r\n  {=split;{split;{$num};.}} \r\n  {=add;{if;{$split.1};>=;5;1;0}} \r\n  {=numb;{math;{$split.0}+{$add}}} \r\n  {$numb} \r\n[/function] \r\n\r\n// Finding upvotes and downvotes\r\n{=upvote;{$data.poll-{$id}.upvote}}\r\n{=downvote;{$data.poll-{$id}.downvote}}\r\n{=total;{math;0{$upvote}+0{$downvote}}}\r\n{=total;{or;{$total};1}}\r\n{=upvotepercent;{round;{math;{$upvote}*100/{$total}}}}\r\n{=downvotepercent;{round;{math;{$downvote}*100/{$total}}}}\r\n\r\n// Changing suggestion's status to accepted\r\n{=data.poll-{$id}.status;denied}\r\n\r\n// Making embed for the new message in the suggestion channel\r\n{=embed.footer.text;Suggestion #{$id} denied}\r\n{=embed.fields;}\r\n{responder.embed color=\"FFD8D6\";{$embed}}\r\n{responder.embedField\r\n  name=\"Reason from {user.tag}\"\r\n  value=\"{or;{$feedback};No reason}\"}\r\n{responder.button style=secondary handler=yes disabled=true label=\"Status: Denied\"}\r\n{responder.edit;{$msgid}}\r\n{responder.send}\r\n\r\n// Function for progress bar\r\n[#function;progressbar;{=num}]\r\n  {=bar1;{if;{$num};<;5;<:bar1empty:1016590808721412126>;{if;{$num};<;10;<a:bar1half:1016590517074661416>;{if;{$num};<;15;<a:bar1mid:1017011517847248907>;<a:bar1full:1016588733757272084>}}}}\r\n  {=bar2;{if;{$num};<;25;<:bar2empty:1016590601766064149>;{if;{$num};<;30;<a:bar2mid:1016589356070346812>;{if;{$num};<;35;<a:bar2mid:1016589356070346812>;<a:bar2full:1016589195923443752>}}}}\r\n  {=bar3;{if;{$num};<;45;<:bar2empty:1016590601766064149>;{if;{$num};<;50;<a:bar2mid:1016589356070346812>;{if;{$num};<;55;<a:bar2mid:1016589356070346812>;<a:bar2full:1016589195923443752>}}}}\r\n  {=bar4;{if;{$num};<;65;<:bar2empty:1016590601766064149>;{if;{$num};<;70;<a:bar2mid:1016589356070346812>;{if;{$num};<;75;<a:bar2mid:1016589356070346812>;<a:bar2full:1016589195923443752>}}}}\r\n  {=bar5;{if;{$num};<;85;<:bar3empty:1016589721020928011>;{if;{$num};<;90;<a:bar3mid:1016589842357948568>;{if;{$num};<;95;<a:bar3mid:1016589842357948568>;<a:bar3full:1016590263176675328>}}}}\r\n  {$bar1}{$bar2}{$bar3}{$bar4}{$bar5}\r\n[/function]\r\n\r\n// Making the embed to be dmed to the sender\r\n{responder.embed\r\n  author-image=\"{user.avatar;{$sender}}\"\r\n  author-name=\"Suggestion #{$id}\"\r\n  color=\"FFD8D6\"\r\n  title=\"Suggestion Denied!\"\r\n  description=\"Your suggestion in **{server.name}** has been marked as denied by {user.mention} {if;{$feedback};with the following reason\r\n  > {$feedback}}\r\n  Thank you for contributing to the server and making a change in it!\"}\r\n{responder.embedField\r\n  name=\"Suggestion Content\"\r\n  value=\">>> {$suggestion}\"}\r\n{responder.embedField\r\n  name=\"Statistics\"\r\n  value=\"<:PepeYes:744104906532585522> **Upvotes**\r\n  <:replycont:906069715884081152> `{$upvote}` people upvoted your post!\r\n  <:reply:906069685110460446> {progressbar;{$upvotepercent}} `{$upvotepercent}%`\r\n  \r\n  <:pepeno:906049948565504011> **Downvotes**\r\n  <:replycont:906069715884081152> `{$downvote}` people downvoted your post!\r\n  <:reply:906069685110460446> {progressbar;{$downvotepercent}} `{$downvotepercent}%`\"}\r\n{responder.dm;{$sender}}\r\n{responder.send}\r\n\r\n// Message to be sent out to the user\r\n{responder.error;Successfully marked suggestion #{$id} as denied!}\r\n\r\n// Setting the storage\r\n{store.set;suggestiondata;{$data}}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "SlashCommand",
+        "name": "suggestion implement",
+        "description": "Accept a suggestion indicating that it has been approved by the server directors!",
+        "parameters": [
+          {
+            "name": "suggestion_id",
+            "type": "Number",
+            "description": "The suggestion ID",
+            "required": true,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          },
+          {
+            "name": "message",
+            "type": "String",
+            "description": "Message for the action performed",
+            "required": false,
+            "min_value": null,
+            "max_value": null,
+            "choices": [],
+            "min_length": null,
+            "max_length": null,
+            "channel_types": []
+          }
+        ]
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// Change all these stuff below based on the stuff\r\n// MAKE SURE TO SETUP THE ROLES EITHER IN NATIVE DISCORD OR THROUGH ATLAS RESTRICTIONS! OTHERWISE EVERYONE WILL BE ABLE TO ACCEPT/DENY SUGGESTIONS!!\r\n// Inputchan is the channel where the cmd is going to work successfully. People will only be able to suggest in that channel.\r\n{=inputchan;{store.get;div}}\r\n// Suggestionchan is the channel where all new suggestions are sent.\r\n{=suggestionchan;{$inputchan}}\r\n// The role to ping.\r\n{=role;}\r\n// Whether to make the suggestions anonymous (true/false)\r\n{=anonymous;false}\r\n\r\n// Calling the inputs\r\n{=id;{option;suggestion_id}}\r\n{=feedback;{option;message}}\r\n\r\n// Calling the storage variable\r\n{=data;{store.get;suggestiondata}}\r\n{=sender;{$data.{$id}.sender}}\r\n\r\n// Running the check for valid suggestionid\r\n{=len;{$data.count}}\r\n[#if;{$id};>;{$len}]\r\n  {return;\r\n    {responder.embed\r\n      description=\"Invalid suggestion id! Please try again\"\r\n      title=\"Error\"}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Running check if suggestion accepted earlier\r\n{if;{$data.poll-{$id}.status};==;ues;\r\n  {return;\r\n    {responder.embed\r\n      title=\"Error\"\r\n      description=\"This suggestion has already been accepted or denied!\"}\r\n    {responder.error}}\r\n}\r\n\r\n// Getting the data for the suggestion\r\n{=msgid;{$data.poll-{$id}.msgid}}\r\n{=embed;{message.embed;{channel.id}-{$msgid}}}\r\n{=suggestion;{$embed.description}}\r\n{=footer;{$embed.footer.text}}\r\n// Function to round off\r\n[#function;round;{=number}]\r\n  {=num;{catch;{formatNumber;{math;{$number}}};{return;{responder.embed title=\"Error\" description=\"Invalid Number\"}{responder.error}}}} \r\n  {=split;{split;{$num};.}} \r\n  {=add;{if;{$split.1};>=;5;1;0}} \r\n  {=numb;{math;{$split.0}+{$add}}} \r\n  {$numb} \r\n[/function] \r\n\r\n// Finding upvotes and downvotes\r\n{=upvote;{$data.poll-{$id}.upvote}}\r\n{=downvote;{$data.poll-{$id}.downvote}}\r\n{=total;{math;0{$upvote}+0{$downvote}}}\r\n{=total;{or;{$total};1}}\r\n{=upvotepercent;{round;{math;{$upvote}*100/{$total}}}}\r\n{=downvotepercent;{round;{math;{$downvote}*100/{$total}}}}\r\n\r\n// Changing suggestion's status to accepted\r\n{=data.poll-{$id}.status;implemented}\r\n\r\n// Making embed for the new message in the suggestion channel\r\n{=embed.footer.text;Suggestion #{$id} implemented}\r\n{=embed.fields;}\r\n{responder.embed color=\"91FBFF\";{$embed}}\r\n{responder.embedField\r\n  name=\"Reason from {user.tag}\"\r\n  value=\"{or;{$feedback};No reason}\"}\r\n{responder.button style=secondary handler=yes disabled=true label=\"Status: Implemented\"}\r\n{responder.edit;{$msgid}}\r\n{responder.send}\r\n\r\n// Function for progress bar\r\n[#function;progressbar;{=num}]\r\n  {=bar1;{if;{$num};<;5;<:bar1empty:1016590808721412126>;{if;{$num};<;10;<a:bar1half:1016590517074661416>;{if;{$num};<;15;<a:bar1mid:1017011517847248907>;<a:bar1full:1016588733757272084>}}}}\r\n  {=bar2;{if;{$num};<;25;<:bar2empty:1016590601766064149>;{if;{$num};<;30;<a:bar2mid:1016589356070346812>;{if;{$num};<;35;<a:bar2mid:1016589356070346812>;<a:bar2full:1016589195923443752>}}}}\r\n  {=bar3;{if;{$num};<;45;<:bar2empty:1016590601766064149>;{if;{$num};<;50;<a:bar2mid:1016589356070346812>;{if;{$num};<;55;<a:bar2mid:1016589356070346812>;<a:bar2full:1016589195923443752>}}}}\r\n  {=bar4;{if;{$num};<;65;<:bar2empty:1016590601766064149>;{if;{$num};<;70;<a:bar2mid:1016589356070346812>;{if;{$num};<;75;<a:bar2mid:1016589356070346812>;<a:bar2full:1016589195923443752>}}}}\r\n  {=bar5;{if;{$num};<;85;<:bar3empty:1016589721020928011>;{if;{$num};<;90;<a:bar3mid:1016589842357948568>;{if;{$num};<;95;<a:bar3mid:1016589842357948568>;<a:bar3full:1016590263176675328>}}}}\r\n  {$bar1}{$bar2}{$bar3}{$bar4}{$bar5}\r\n[/function]\r\n\r\n// Making the embed to be dmed to the sender\r\n{responder.embed\r\n  author-image=\"{user.avatar;{$sender}}\"\r\n  author-name=\"Suggestion #{$id}\"\r\n  color=\"91FBFF\"\r\n  title=\"Suggestion Implemented!\"\r\n  description=\"Your suggestion in **{server.name}** has been marked as implemented by {user.mention} {if;{$feedback};with the following reason\r\n  > {$feedback}}\r\n  Thank you for contributing to the server and making a change in it!\"}\r\n{responder.embedField\r\n  name=\"Suggestion Content\"\r\n  value=\">>> {$suggestion}\"}\r\n{responder.embedField\r\n  name=\"Statistics\"\r\n  value=\"<:PepeYes:744104906532585522> **Upvotes**\r\n  <:replycont:906069715884081152> `{$upvote}` people upvoted your post!\r\n  <:reply:906069685110460446> {progressbar;{$upvotepercent}} `{$upvotepercent}%`\r\n  \r\n  <:pepeno:906049948565504011> **Downvotes**\r\n  <:replycont:906069715884081152> `{$downvote}` people downvoted your post!\r\n  <:reply:906069685110460446> {progressbar;{$downvotepercent}} `{$downvotepercent}%`\"}\r\n{responder.dm;{$sender}}\r\n{responder.send}\r\n\r\n// Message to be sent out to the user\r\n{responder.error;Successfully marked suggestion #{$id} as implemented!}\r\n\r\n// Setting the storage\r\n{store.set;suggestiondata;{$data}}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "ComponentCallback",
+        "handlerName": "suggestion",
+        "editOriginal": false,
+        "disableComponent": false
+      },
+      "disabled": false,
+      "name": "My Action",
+      "content": "// Put your required data here.\r\n// Inputchan is the channel where the cmd is going to work successfully. People will only be able to suggest in that channel.\r\n{=inputchan;{store.get;div}}\r\n// Suggestionchan is the channel where all new suggestions are sent.\r\n{=suggestionchan;{$inputchan}}\r\n// The role to ping.\r\n{=role;}\r\n\r\n// Calling the storage variable\r\n{=data;{store.get;suggestiondata}}\r\n\r\n// Finding the message id of the message\r\n{=msg;{message.id}}\r\n\r\n// Finding the message data\r\n{=id;{find;{$data};/\"([^\"]+)\":\\s\\\\\\{[^\\\\\\}]+\"msgid\":\\s\"{$msg}\"/i;1}}\r\n\r\n// Finding the old ratings\r\n{=upvote;{math;0{$data.{$id}.upvote}}}\r\n{=downvote;{math;0{$data.{$id}.downvote}}}\r\n\r\n// Finding the button clicked\r\n{=clicked;{$state}}\r\n{=other;{replace;upvotedownvote;{$state};}}\r\n\r\n// Finding the sender for the suggestion\r\n{=sender;{$data.{$id}.sender}}\r\n\r\n// Finding the people who have voted for the said suggestion.\r\n{=upvoters;{$data.{$id}.upvoters}}\r\n{=downvoters;{$data.{$id}.downvoters}}\r\n\r\n// Running the check if the user is the sender\r\n[#if;{user.id};==;{$sender}]\r\n  {return;\r\n    {responder.text;You cannot vote for your own suggestions.}\r\n    {responder.error}}\r\n[/if]\r\n\r\n// Setting the new ratings if the user has not voted already\r\n[#if;{$upvoters} {$downvoters};!includes;{user.id}]\r\n  {=data.{$id}.{$state};{math;0{${$state}}+1}}\r\n  {=data.{$id}.{$state}rs;{${$state}rs} {user.id}}\r\n[/if]\r\n\r\n// Setting the new ratings if the user has voted already and remove their vote\r\n[#if;{${$state}rs};includes;{user.id}]\r\n  {=data.{$id}.{$state}rs;{replace;{${$state}rs}; {user.id};}}\r\n  {=data.{$id}.{$state};{math;0{${$state}}-1}}\r\n  {=smth;removed your vote from}\r\n[/if]\r\n\r\n\r\n// Removing the data from the other option if user has already voted\r\n[#if;{${$other}rs};includes;{user.id}]\r\n  {=data.{$id}.{$state};{math;0{${$state}}+1}}\r\n  {=data.{$id}.{$state}rs;{${$state}rs} {user.id}}\r\n  {=data.{$id}.{$other}rs;{replace;{${$other}rs}; {user.id};}}\r\n  {=data.{$id}.{$other};{math;{${$other}}-1}}\r\n[/if]\r\n\r\n// Finding the new ratings\r\n{=newupvote;{math;0{$data.{$id}.upvote}}}\r\n{=newdownvote;{math;0{$data.{$id}.downvote}}}\r\n\r\n// Sending confirmation to the user\r\n{responder.text;You have successfully {or;{$smth};voted for} [this]({message.link;{message.id}}) suggestion! You can change your suggestion by clicking on the other button}\r\n{responder.ephemeral}\r\n{responder.send}\r\n\r\n// Making the new buttons\r\n{responder.embed;{message.embed;{$msg}}}\r\n{responder.text;{message.content}}\r\n{responder.button \r\n  label=\"Upvote{if;{$newupvote};!==;0; ({$newupvote})}\" \r\n  handler=suggestion \r\n  state=upvote}\r\n{responder.button \r\n  label=\"Downvote{if;{$newdownvote};!==;0; ({$newdownvote})}\" \r\n  handler=suggestion \r\n  state=downvote \r\n  style=secondary}\r\n{responder.edit;{message.id}}\r\n{responder.send}\r\n\r\n// Setting the persistent variable.\r\n{store.set;suggestiondata;{$data}}\r\n\r\n\r\n\r\n",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    },
+    {
+      "trigger": {
+        "type": "MessageCreate",
+        "channelId": "1163540044020199555"
+      },
+      "disabled": true,
+      "name": "My Action",
+      "content": "// Put your required data here.\r\n// Inputchan is the channel where the cmd is going to work successfully. People will only be able to suggest in that channel.\r\n{=inputchan;{store.get;div}}\r\n// Suggestionchan is the channel where all new suggestions are sent.\r\n{=suggestionchan;{$inputchan}}\r\n// The role to ping.\r\n{=role;}\r\n// Whether to make the suggestions anonymous (true/false)\r\n{=anonymous;false}\r\n\r\n// DO NOT TOUCH ANYTHING BELOW THIS UNLESS YOU KNOW WHAT YOU ARE DOING\r\n{=suggestion;{message.content}}\r\n{=suggestiondata;{store.get;suggestiondata}}\r\n\r\n// Calling the suggestion num.\r\n{=count;{math;0{$suggestiondata.count}}}\r\n{=id;{math;{$count}+1}}\r\n\r\n// Making the embed\r\n{responder.embed\r\n  author-image=\"{if;{$anonymous};==;true;https://res.cloudinary.com/demo/image/fetch/https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Blue_question_mark_icon.svg/2048px-Blue_question_mark_icon.svg.png/823904633944539196;{user.avatar}}\"\r\n  author-name=\"{if;{$anonymous};==;true;Anonymous User;{user.tag}}\"\r\n  color=\"#0C0C0C\"\r\n  description=\"{$suggestion}\"\r\n  footer=\"Suggestion #{$id}\"\r\n  timestamp=now}\r\n{responder.channel;{$suggestionchan}}\r\n\r\n// Pinging the role.\r\n{if;{$role};{responder.text;{role.mention allow_mention;{$role}}}}\r\n\r\n// Making the buttons\r\n{responder.button label=\"Upvote\" handler=suggestion state=upvote}\r\n{responder.button label=\"Downvote\" handler=suggestion state=downvote style=secondary}\r\n\r\n// Sending the confirmation\r\n{=msgid;{responder.send return_id=true}}\r\n\r\n// Setting the data for the suggestion in the storage\r\n{=data.msgid;{$msgid}}\r\n{=data.sender;{user.id}}\r\n{=data.upvote;0}\r\n{=data.downvote;0}\r\n{=data.upvoters;}\r\n{=data.downvoters;}\r\n{=suggestiondata.poll-{$id};{$data}}\r\n{=suggestiondata.count;{$id}}\r\n\r\n{message.delete}\r\n// Setting the new storage variable.\r\n{store.set;suggestiondata;{$suggestiondata}}",
+      "cooldownSeconds": 0,
+      "cooldownType": "User",
+      "restriction": null,
+      "flags": "0"
+    }
+  ]
+}
