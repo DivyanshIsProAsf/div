@@ -1,4 +1,41 @@
-[
+            {
+                "props": {
+                    "pageProps": {
+                        "user": {
+                            "id": "823904633944539196",
+                            "username": "divyansh.",
+                            "avatar": "https://cdn.discordapp.com/avatars/823904633944539196/774b6a063333cdd0719e0b0e29b1760f",
+                            "discriminator": "0",
+                            "public_flags": 128,
+                            "premium_type": 0,
+                            "flags": 128,
+                            "banner": null,
+                            "accent_color": 16711906,
+                            "global_name": "Divyansh.",
+                            "avatar_decoration_data": null,
+                            "banner_color": "#ff00e2",
+                            "mfa_enabled": true,
+                            "locale": "en-US",
+                            "email": "divyansh.bt@gmail.com",
+                            "verified": true,
+                            "developer": false,
+                            "moderator": false,
+                            "botModerator": false,
+                            "modManager": false,
+                            "honorable": false,
+                            "token": "LvydY/660m5zTB8Ys00+2xm8",
+                            "perks": false
+                        },
+                        "categories": [
+                            "Collectable",
+                            "Consumable",
+                            "Loot Box",
+                            "Pack",
+                            "Power-up",
+                            "Sellable",
+                            "Tool"
+                        ],
+                        "items": [
                             {
                                 "id": 126,
                                 "itemKey": "aplus",
@@ -6045,4 +6082,19 @@
                                 "skins": {
                                 }
                             }
-                        ]
+                        ],
+                        "_sentryTraceData": "d4d4d24d336b4a7eb32037f88785e6a3-a8c972d6304d377a-1",
+                        "_sentryBaggage": "sentry-environment=production,sentry-release=09u4hp7D-5ixY8fxYHHmH,sentry-public_key=875aaa0d2b1a4bdb836a56255d0fda7e,sentry-trace_id=d4d4d24d336b4a7eb32037f88785e6a3,sentry-sample_rate=1,sentry-transaction=%2Fitems,sentry-sampled=true"
+                    },
+                    "__N_SSP": true
+                },
+                "page": "/items",
+                "query": {
+                },
+                "buildId": "09u4hp7D-5ixY8fxYHHmH",
+                "isFallback": false,
+                "isExperimentalCompile": false,
+                "gssp": true,
+                "scriptLoader": [
+                    ]
+                }
